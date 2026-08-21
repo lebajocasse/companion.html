@@ -12,11 +12,11 @@
     --border: #33383F;
     --text: #ECE8DE;
     --text-dim: #9A9FA6;
-    --accent: #FF5A2E;      /* hold orange */
+    --accent: #FF5A2E;
     --accent-dim: #7A2F1B;
-    --blue: #49AEDB;        /* video / info */
-    --green: #7FD858;       /* complete */
-    --gold: #C9A94F;        /* deload */
+    --blue: #49AEDB;
+    --green: #7FD858;
+    --gold: #C9A94F;
     --radius: 10px;
     --display: 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
     --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -27,7 +27,6 @@
   body{padding:0 0 60px 0;}
   .wrap{max-width:920px;margin:0 auto;padding:0 18px;}
 
-  /* header */
   header{border-bottom:1px solid var(--border);background:
     linear-gradient(180deg, #191B1F 0%, #14161A 100%);}
   .headbar{max-width:920px;margin:0 auto;padding:26px 18px 20px;
@@ -40,7 +39,6 @@
   .meta{text-align:right;font-size:12.5px;color:var(--text-dim);line-height:1.7;}
   .meta b{color:var(--text);font-weight:600;}
 
-  /* week tabs */
   .tabs{display:flex;gap:8px;margin:22px 0 6px;flex-wrap:wrap;}
   .tab{font-family:var(--mono);font-weight:700;font-size:13px;padding:9px 14px;border-radius:7px;
     background:var(--panel);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;
@@ -49,7 +47,6 @@
   .tab.active{background:var(--accent);border-color:var(--accent);color:#1a0d06;}
   .tab.deload.active{background:var(--gold);border-color:var(--gold);}
 
-  /* coach note */
   .coachnote{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);
     border-radius:var(--radius);padding:16px 18px;margin:16px 0 26px;font-size:14.5px;line-height:1.6;}
   .coachnote .tag{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;
@@ -57,7 +54,15 @@
   .coachnote-card{border-left:4px solid var(--accent);margin-bottom:22px;}
   .coachnote-card .card-body{white-space:pre-line;font-size:14px;line-height:1.6;}
 
-  /* section card */
+  .day-header{font-family:var(--display);font-weight:800;font-size:12px;text-transform:uppercase;
+    letter-spacing:0.14em;color:var(--text-dim);margin:26px 0 10px;padding-bottom:7px;
+    border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .day-header:first-of-type{margin-top:4px;}
+  .day-header .day-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .rest-day{background:var(--panel);border:1px dashed var(--border);border-radius:var(--radius);
+    padding:16px;margin-bottom:8px;color:var(--text-dim);font-size:13px;text-align:center;
+    font-style:italic;}
+
   .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
     margin-bottom:14px;overflow:hidden;transition:border-color .15s ease;}
   .card.session-done{border-color:var(--green);}
@@ -77,7 +82,6 @@
   .progress-pill{font-family:var(--mono);font-size:11px;color:var(--text-dim);}
   .progress-pill.done{color:var(--green);}
 
-  /* drill */
   .drill{padding:14px 0;border-bottom:1px solid var(--border);}
   .drill:last-child{border-bottom:none;}
   .drill-row{display:flex;align-items:flex-start;gap:10px;}
@@ -98,7 +102,6 @@
   .vid-fallback{font-size:11.5px;color:var(--text-dim);margin-top:6px;}
   .vid-fallback a{color:var(--blue);}
 
-  /* set tables (fingerboard / conditioning) */
   .set-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px;}
   .set-table th{text-align:left;font-family:var(--display);font-weight:700;font-size:10.5px;
     text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);padding:6px 8px;
@@ -109,7 +112,6 @@
     border-radius:5px;color:var(--text);padding:5px 6px;font-size:12.5px;font-family:var(--mono);}
   .set-table input[type=checkbox]{accent-color:var(--green);width:16px;height:16px;cursor:pointer;}
 
-  /* projecting */
   .goal-ladder{list-style:none;margin:10px 0;padding:0;counter-reset:goal;}
   .goal-ladder li{counter-increment:goal;padding:8px 0 8px 30px;position:relative;font-size:13.5px;
     border-bottom:1px solid #26292E;}
@@ -167,7 +169,6 @@
 <footer>Built from your Catalyst reference glossary + Dave's 5-week plan. Progress and notes are saved automatically.</footer>
 
 <script>
-/* ---------- VIDEO LINKS ---------- */
 const VID = {
   A1: "https://youtu.be/VkWt3qsmXJ4",
   A2: "https://youtu.be/QT1CJtIk-Ls",
@@ -188,7 +189,6 @@ const VID = {
   PROJECT_FORM: "https://docs.google.com/forms/d/e/1FAIpQLSc-xpqfzNlGXbkBHf-PIf9PX84VZ8Isuqi-4vk3TZLu5yp-dg/viewform?usp=header"
 };
 
-/* ---------- COACH NOTES PER WEEK ---------- */
 const COACH_NOTES = {
   1: `I have given you a straightforward strength based plan. There is lots of scope to work on technique and mindset, etc, but we can address those in future plans.
 Your first session is projecting — choose limit boulders, ones you would normally be wary of trying, and set appropriate goals for each session. The second session is on-the-wall strength training: a bit of overhang fitness, then some boulder-specific strength work.
@@ -202,7 +202,6 @@ Keep pushing the conditioning as hard as you can while still finishing every rep
   5: `Deload week — no on-the-wall, conditioning or fingerboard work. Just three stretching sessions to help you recover before your next cycle.`
 };
 
-/* ---------- SHARED SESSION TEMPLATES (Weeks 1-4 identical) ---------- */
 function onWallSession1(){
   return {
     title: "On The Wall — Session 1 (Projecting)",
@@ -222,9 +221,17 @@ function onWallSession1(){
     ]
   };
 }
-function onWallSession2(){
+function onWallSessionClass(){
   return {
-    title: "On The Wall — Session 2 (Strength)",
+    title: "On The Wall — Session 2 (Class)",
+    code: "",
+    time: "Coached class",
+    drills: []
+  };
+}
+function onWallSession3(){
+  return {
+    title: "On The Wall — Session 3 (Strength)",
     code: "E",
     time: "~120 min",
     drills: [
@@ -315,14 +322,14 @@ function stretchSession(n){
   return {title:`Stretching — Session ${n}`, time:"~20 min", list:STRETCH_LIST};
 }
 
-/* ---------- BUILD WEEKS ---------- */
 const WEEKS = {};
 [1,2,3,4].forEach(w=>{
   WEEKS[w] = {
     deload:false,
     coachNote: COACH_NOTES[w] || null,
     onWall1: onWallSession1(),
-    onWall2: onWallSession2(),
+    onWallClass: onWallSessionClass(),
+    onWall3: onWallSession3(),
     conditioning: conditioning(),
     fbMax: fingerboardMaxHangs(),
     fbRep: fingerboardRepeaters(),
@@ -332,7 +339,6 @@ const WEEKS = {};
 });
 WEEKS[5] = {deload:true, coachNote: COACH_NOTES[5]};
 
-/* ---------- STORAGE HELPERS ---------- */
 const STORAGE_PREFIX = 'catalyst_companion:';
 async function getVal(key, fallback){
   try{
@@ -345,11 +351,9 @@ async function setVal(key, val){
   catch(e){ console.error("storage set failed", e); }
 }
 
-/* ---------- STATE ---------- */
 let currentWeek = 1;
 const openCards = new Set();
 
-/* ---------- RENDER ---------- */
 const tabsEl = document.getElementById('tabs');
 const contentEl = document.getElementById('content');
 
@@ -396,6 +400,15 @@ function drillHTML(sessionKey, d, idx){
   </div>`;
 }
 
+function dayHeader(label){
+  return `<div class="day-header"><span class="day-dot"></span>${label}</div>`;
+}
+function restDayHTML(label){
+  return `
+  <div class="day-header"><span class="day-dot" style="background:var(--text-dim);"></span>${label}</div>
+  <div class="rest-day">Rest day — no training scheduled. Recover!</div>`;
+}
+
 function coachNoteCardHTML(weekKey, weekNum, note){
   const key = `${weekKey}:coachnote`;
   const open = openCards.has(key);
@@ -426,12 +439,17 @@ function cardShell(key, title, code, timeLabel, bodyHTML){
 }
 
 function onWallCardHTML(sessionKey, session){
-  let body = session.drills.map((d,i)=>{
-    if(d.special==='projecting'){
-      return drillHTML(sessionKey, d, i) + projectingExtrasHTML(sessionKey);
-    }
-    return drillHTML(sessionKey, d, i);
-  }).join('');
+  let body;
+  if(!session.drills || session.drills.length === 0){
+    body = `<div class="note-box">This is your coached class session — no set drills listed here yet. Just tick the box above once it's done.</div>`;
+  } else {
+    body = session.drills.map((d,i)=>{
+      if(d.special==='projecting'){
+        return drillHTML(sessionKey, d, i) + projectingExtrasHTML(sessionKey);
+      }
+      return drillHTML(sessionKey, d, i);
+    }).join('');
+  }
   return cardShell(sessionKey, session.title, session.code, session.time, body);
 }
 
@@ -568,20 +586,34 @@ function renderContent(){
   if(wk.coachNote){
     html += coachNoteCardHTML(weekKey, currentWeek, wk.coachNote);
   }
+
+  html += dayHeader('Monday');
   html += onWallCardHTML(`${weekKey}:onwall1`, wk.onWall1);
-  html += onWallCardHTML(`${weekKey}:onwall2`, wk.onWall2);
-  html += conditioningCardHTML(weekKey, wk.conditioning);
-  html += fingerboardCardHTML(weekKey, 'fbmax', wk.fbMax);
-  html += fingerboardCardHTML(weekKey, 'fbrep', wk.fbRep);
   html += stretchCardHTML(weekKey, 'stretch1', wk.stretch1, VID.STRETCH_UPPER);
+
+  html += dayHeader('Tuesday');
+  html += fingerboardCardHTML(weekKey, 'fbmax', wk.fbMax);
+
+  html += dayHeader('Wednesday');
+  html += onWallCardHTML(`${weekKey}:onwallclass`, wk.onWallClass);
+
+  html += restDayHTML('Thursday');
+
+  html += dayHeader('Friday');
+  html += fingerboardCardHTML(weekKey, 'fbrep', wk.fbRep);
+
+  html += dayHeader('Saturday / Sunday');
+  html += onWallCardHTML(`${weekKey}:onwall3`, wk.onWall3);
   html += stretchCardHTML(weekKey, 'stretch2', wk.stretch2, VID.STRETCH_LOWER);
+
+  html += dayHeader('Saturday / Sunday');
+  html += conditioningCardHTML(weekKey, wk.conditioning);
 
   contentEl.innerHTML = html;
   attachHandlers();
   hydrateState();
 }
 
-/* ---------- INTERACTIVITY ---------- */
 function attachHandlers(){
   document.querySelectorAll('.card-head').forEach(h=>{
     h.onclick = ()=>{
@@ -595,9 +627,24 @@ function attachHandlers(){
   document.querySelectorAll('.vid-btn[data-embed]').forEach(btn=>{
     btn.onclick = ()=>{
       const target = document.getElementById(btn.dataset.target);
+      const wasOpen = target.classList.contains('open');
+
+      document.querySelectorAll('.vid-btn[data-embed]').forEach(otherBtn=>{
+        if(otherBtn === btn) return;
+        const otherTarget = document.getElementById(otherBtn.dataset.target);
+        if(otherTarget && otherTarget.classList.contains('open')){
+          otherTarget.classList.remove('open');
+          otherTarget.innerHTML = '';
+          const otherFallback = otherTarget.nextElementSibling && otherTarget.nextElementSibling.classList.contains('vid-fallback')
+            ? otherTarget.nextElementSibling : null;
+          if(otherFallback) otherFallback.remove();
+          otherBtn.textContent = otherBtn.dataset.label;
+        }
+      });
+
       const existingFallback = target.nextElementSibling && target.nextElementSibling.classList.contains('vid-fallback')
         ? target.nextElementSibling : null;
-      if(target.classList.contains('open')){
+      if(wasOpen){
         target.classList.remove('open');
         target.innerHTML = '';
         if(existingFallback) existingFallback.remove();
@@ -606,12 +653,10 @@ function attachHandlers(){
         target.classList.add('open');
         target.innerHTML = `<iframe src="${btn.dataset.embed}?autoplay=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
         btn.textContent = btn.dataset.label.replace('▶', '▼').replace(/Watch/i, 'Hide');
-        if(!existingFallback){
-          const fallback = document.createElement('div');
-          fallback.className = 'vid-fallback';
-          fallback.innerHTML = `Video blocked here? <a href="${btn.dataset.watch}" target="_blank" rel="noopener">Open on YouTube instead ↗</a>`;
-          target.after(fallback);
-        }
+        const fallback = document.createElement('div');
+        fallback.className = 'vid-fallback';
+        fallback.innerHTML = `Video blocked here? <a href="${btn.dataset.watch}" target="_blank" rel="noopener">Open on YouTube instead ↗</a>`;
+        target.after(fallback);
       }
     };
   });
@@ -682,4 +727,3 @@ renderContent();
 </script>
 </body>
 </html>
-
