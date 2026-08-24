@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalyst Training Companion — Vincent Husset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+<!-- PWA: installability meta (Android + desktop via dynamic manifest below) -->
+<meta name="theme-color" content="#14161A">
+
+<!-- PWA: iPhone-specific home-screen behavior (Safari ignores manifest.json for this) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Catalyst">
+
+<script>
+(function(){
+  // Single square icon (no separate image file needed) — dark panel bg, orange "C" mark
+  const iconSVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+    + '<rect width="100" height="100" fill="#14161A"/>'
+    + '<text x="50" y="70" font-family="Arial, sans-serif" font-weight="900" font-size="62" '
+    + 'fill="#FF5A2E" text-anchor="middle">C</text></svg>';
+  const iconDataUri = 'data:image/svg+xml;base64,' + btoa(iconSVG);
+
+  // Apple touch icon (iPhone home-screen icon)
+  const appleIcon = document.createElement('link');
+  appleIcon.rel = 'apple-touch-icon';
+  appleIcon.href = iconDataUri;
+  document.head.appendChild(appleIcon);
+
+  // Web app manifest (Android/Chrome install prompt) — built at runtime as a
+  // Blob so no separate manifest.json file is needed.
+  const manifest = {
+    name: "Catalyst Training Companion",
+    short_name: "Catalyst",
+    start_url: "Catalyst.html",
+    display: "standalone",
+    background_color: "#14161A",
+    theme_color: "#14161A",
+    icons: [
+      { src: iconDataUri, sizes: "192x192", type: "image/svg+xml" },
+      { src: iconDataUri, sizes: "512x512", type: "image/svg+xml" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const manifestLink = document.createElement('link');
+  manifestLink.rel = 'manifest';
+  manifestLink.href = URL.createObjectURL(blob);
+  document.head.appendChild(manifestLink);
+})();
+</script>
+
+<style>
+  :root{
+    --bg: #000000;
+    --panel: #1D2025;
+    --panel-alt: #262A30;
+    --border: #33383F;
+    --text: #ECE8DE;
+    --text-dim: #9A9FA6;
+    --accent: #FF5A2E;      /* hold orange */
+    --accent-dim: #7A2F1B;
+    --blue: #49AEDB;        /* video / info */
+    --green: #7FD858;       /* complete */
+    --gold: #C9A94F;        /* deload */
+    --coached: #B565F5;     /* coached wall sessions */
+    --pixel-clip-lg: polygon(0 16px,2px 16px,2px 10px,5px 10px,5px 5px,10px 5px,10px 2px,16px 2px,16px 0,
+      calc(100% - 16px) 0,calc(100% - 16px) 2px,calc(100% - 10px) 2px,calc(100% - 10px) 5px,
+      calc(100% - 5px) 5px,calc(100% - 5px) 10px,calc(100% - 2px) 10px,calc(100% - 2px) 16px,100% 16px,
+      100% calc(100% - 16px),calc(100% - 2px) calc(100% - 16px),calc(100% - 2px) calc(100% - 10px),
+      calc(100% - 5px) calc(100% - 10px),calc(100% - 5px) calc(100% - 5px),calc(100% - 10px) calc(100% - 5px),
+      calc(100% - 10px) calc(100% - 2px),calc(100% - 16px) calc(100% - 2px),calc(100% - 16px) 100%,
+      16px 100%,16px calc(100% - 2px),10px calc(100% - 2px),10px calc(100% - 5px),5px calc(100% - 5px),
+      5px calc(100% - 10px),2px calc(100% - 10px),2px calc(100% - 16px),0 calc(100% - 16px));
+    --pixel-clip-sm: polygon(0 8px,1px 8px,1px 5px,3px 5px,3px 3px,5px 3px,5px 1px,8px 1px,8px 0,
+      calc(100% - 8px) 0,calc(100% - 8px) 1px,calc(100% - 5px) 1px,calc(100% - 5px) 3px,
+      calc(100% - 3px) 3px,calc(100% - 3px) 5px,calc(100% - 1px) 5px,calc(100% - 1px) 8px,100% 8px,
+      100% calc(100% - 8px),calc(100% - 1px) calc(100% - 8px),calc(100% - 1px) calc(100% - 5px),
+      calc(100% - 3px) calc(100% - 5px),calc(100% - 3px) calc(100% - 3px),calc(100% - 5px) calc(100% - 3px),
+      calc(100% - 5px) calc(100% - 1px),calc(100% - 8px) calc(100% - 1px),calc(100% - 8px) 100%,
+      8px 100%,8px calc(100% - 1px),5px calc(100% - 1px),5px calc(100% - 3px),3px calc(100% - 3px),
+      3px calc(100% - 5px),1px calc(100% - 5px),1px calc(100% - 8px),0 calc(100% - 8px));
+    --radius: 10px;
+    --display: 'VT323', 'Arial Narrow', monospace;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
+  html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0;}
+  body{padding:0 0 100px 0;}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,0.35) 0px,rgba(0,0,0,0.35) 1px,
+      transparent 1px,transparent 3px);
+    opacity:0.35;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 18px;}
+
+  /* header */
+  header{background:#000000;}
+  .headbar{max-width:920px;margin:0 auto;padding:26px 18px 16px;
+    display:flex;align-items:center;justify-content:center;}
+  .led-title-wrap{width:100%;}
+  .led-title{display:flex;justify-content:center;gap:7px;width:100%;}
+  .led-letter{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);
+    gap:2px;flex:1;aspect-ratio:3/4;}
+  .led-pixel{border-radius:2px;background:transparent;}
+  .led-pixel.on{background:var(--accent);}
+  .subtitle{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:0.1em;
+    color:#FFFFFF;text-transform:uppercase;}
+  .subtitle-box{background:var(--panel-alt);border:1px solid var(--border);clip-path:var(--pixel-clip-lg);
+    padding:9px 16px;display:inline-block;margin-top:8px;}
+  .meta{text-align:right;font-size:12.5px;color:var(--text-dim);line-height:1.7;}
+  .meta b{color:var(--text);font-weight:600;}
+
+  /* week tabs */
+  .tabs{display:flex;gap:8px;margin:22px 0 6px;flex-wrap:wrap;}
+
+  /* view switcher (Overview / Sesh) */
+  .view-tabs{position:fixed;left:18px;right:18px;bottom:16px;max-width:884px;margin:0 auto;
+    display:flex;gap:6px;background:rgba(29,32,37,0.82);backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);border:1px solid var(--border);
+    border-radius:18px;padding:4px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+  .view-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;font-family:var(--display);font-weight:800;font-size:13px;
+    text-transform:uppercase;letter-spacing:0.03em;padding:10px 0 9px;border-radius:14px;cursor:pointer;
+    color:rgba(255,255,255,0.8);}
+  .view-tab-icon{width:23px;height:23px;}
+  .view-tab-icon svg{width:100%;height:100%;}
+  .view-tab.active{background:#fff;color:#14161A;}
+
+  /* progress rings */
+  .ring-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;margin:-6px;}
+  .ring-grid > .ring-card:nth-child(5){grid-column:1 / -1;justify-self:center;max-width:50%;}
+  .ring-card{display:flex;flex-direction:column;align-items:center;padding:8px 4px;}
+  .ring-wrap{position:relative;width:100%;max-width:200px;aspect-ratio:1;margin:0 auto;}
+  .ring-svg{width:100%;height:100%;}
+  .ring-tick.lit{opacity:1;}
+  .ring-tick.dim{opacity:1;stroke:#26282C;}
+  .ring-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-weight:800;font-size:25px;z-index:2;}
+  .ring-inner-frame{position:absolute;top:19%;left:19%;width:62%;height:62%;
+    border:2px solid var(--panel-alt);border-radius:50%;}
+  .ring-label{margin-top:10px;font-family:var(--display);font-weight:700;font-size:15px;
+    text-transform:uppercase;letter-spacing:0.04em;color:#FFFFFF;text-align:center;}
+  .lvl-block{text-align:center;margin:0 0 14px;}
+  .vincent-label{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:0.08em;
+    color:#FFFFFF;text-transform:uppercase;margin-bottom:8px;}
+  .lvl-bar-track{position:relative;height:68px;background:var(--panel-alt);
+    clip-path:var(--pixel-clip-lg);margin:16px 0 12px;padding:2px;}
+  .lvl-bar-track-inner{position:relative;width:100%;height:100%;background:#000000;
+    clip-path:var(--pixel-clip-lg);overflow:hidden;}
+  .lvl-bar-leds{position:absolute;inset:0;display:flex;gap:2px;padding:0 2px;z-index:1;}
+  .lvl-bar-led{flex:1;height:100%;}
+  .lvl-bar-led.lit{animation:ledBarFlicker 3s steps(1) infinite;}
+  @keyframes ledBarFlicker{
+    0%{background:var(--accent);} 20%{background:var(--blue);} 40%{background:var(--green);}
+    60%{background:var(--gold);} 80%{background:var(--coached);} 100%{background:var(--accent);}
+  }
+  .lvl-bar-led.dim{animation:ledBarFlickerDim 3s steps(1) infinite;}
+  @keyframes ledBarFlickerDim{
+    0%{background:#202024;} 25%{background:#2a2a2f;} 50%{background:#191a1d;}
+    75%{background:#26262b;} 100%{background:#202024;}
+  }
+  .lvl-bar-label{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-weight:800;font-size:34px;letter-spacing:0.04em;color:#FFFFFF;
+    text-shadow:0 1px 2px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6);}
+
+  /* shared boxed-section style (All-Time + This Cycle calendar) */
+  .stat-box{background:var(--panel-alt);clip-path:var(--pixel-clip-lg);padding:2px;margin:16px 0;}
+  .stat-box-inner{background:#000000;clip-path:var(--pixel-clip-lg);padding:12px;}
+  .stat-box-title{font-family:var(--display);font-weight:800;font-size:15px;text-transform:uppercase;
+    letter-spacing:0.1em;color:#FFFFFF;margin-bottom:12px;text-align:center;}
+
+  .alltime-row{display:grid;gap:4px;}
+  .alltime-row-5{grid-template-columns:repeat(5,1fr);}
+  .alltime-stat{text-align:center;}
+  .alltime-num{display:block;font-family:var(--mono);font-weight:800;font-size:19px;}
+  .alltime-lbl{display:block;font-family:var(--display);font-weight:700;font-size:12px;
+    text-transform:uppercase;letter-spacing:0.01em;color:#FFFFFF;margin-top:4px;}
+  .alltime-hours{display:block;font-family:var(--mono);font-weight:800;font-size:15px;
+    opacity:0.9;margin-top:1px;}
+
+  /* calendar */
+  .cal-row{display:grid;grid-template-columns:20px repeat(7,1fr);gap:4px;align-items:center;
+    margin-bottom:4px;}
+  .cal-daylabel{font-family:var(--mono);font-size:10px;color:var(--text-dim);text-align:center;}
+  .cal-weeknum{font-family:var(--mono);font-size:11px;color:var(--text-dim);text-align:center;}
+  .cal-box{aspect-ratio:1;clip-path:var(--pixel-clip-sm);background:var(--panel-alt);border:1px solid var(--border);}
+  .cal-box.green{background:var(--green);border-color:var(--green);}
+  .cal-box.rest{background:var(--panel-alt);border-color:var(--border);}
+  .mini-pixel-letter{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);
+    gap:1px;width:55%;height:70%;margin:15% auto 0;}
+  .mini-pixel{background:transparent;}
+  .mini-pixel.on{background:var(--text-dim);border-radius:0.5px;}
+  .cal-box.coached{background:var(--coached);border-color:var(--coached);}
+  .cal-box.muted{background:var(--panel-alt);opacity:0.35;}
+
+  /* celebration overlay */
+  #celebrationOverlay{position:fixed;top:28%;left:50%;width:90%;max-width:360px;
+    transform:translateX(-50%) translateY(14px) scale(0.75) rotate(-2deg);
+    font-family:var(--display);font-weight:900;font-size:50px;
+    line-height:1.1;text-transform:uppercase;letter-spacing:0.01em;
+    background:linear-gradient(90deg,#FF5A2E,#FFD23F,#7FD858,#49AEDB,#B565F5,#FF5A2E);
+    background-size:300% 100%;-webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    filter:drop-shadow(0 6px 18px rgba(0,0,0,0.8));
+    z-index:200;opacity:0;pointer-events:none;text-align:center;
+    transition:opacity .3s ease, transform .5s cubic-bezier(.34,1.56,.64,1);}
+  #celebrationOverlay.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1) rotate(0deg);
+    animation:rainbowShift 1.8s linear infinite;}
+  @keyframes rainbowShift{
+    0%{background-position:0% 50%;}
+    100%{background-position:100% 50%;}
+  }
+  .confetti-container{position:fixed;inset:0;pointer-events:none;z-index:199;overflow:hidden;}
+  .confetti-piece{position:absolute;top:-24px;width:9px;height:15px;opacity:0.95;border-radius:2px;
+    animation-name:confettiFall;animation-timing-function:cubic-bezier(.3,0,.7,1);animation-fill-mode:forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(112vh) rotate(var(--rot));opacity:0.25;}
+  }
+
+  /* full green fill once ticked */
+  .drill.ticked{border:2px solid var(--green);border-radius:8px;margin:0 -8px 0 -8px;padding-left:8px;
+    padding-right:8px;}
+  tr.ticked td{box-shadow:inset 0 2px 0 var(--green), inset 0 -2px 0 var(--green);}
+  tr.ticked td:first-child{box-shadow:inset 0 2px 0 var(--green), inset 0 -2px 0 var(--green), inset 2px 0 0 var(--green);}
+  tr.ticked td:last-child{box-shadow:inset 0 2px 0 var(--green), inset 0 -2px 0 var(--green), inset -2px 0 0 var(--green);}
+
+  .tab{font-family:var(--mono);font-weight:700;font-size:13px;padding:9px 14px;border-radius:7px;
+    background:var(--panel);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;
+    letter-spacing:0.03em;transition:all .12s ease;}
+  .tab:hover{border-color:#4a5058;color:var(--text);}
+  .tab.active{background:#fff;border-color:#fff;color:#14161A;}
+  .tab.week-done{box-shadow:0 0 0 2px var(--green) inset;}
+  .tab.deload.active{background:var(--gold);border-color:var(--gold);}
+
+  /* coach note */
+  .coachnote{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);
+    border-radius:var(--radius);padding:16px 18px;margin:16px 0 26px;font-size:14.5px;line-height:1.6;}
+  .coachnote .tag{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;
+    font-size:15px;color:var(--accent);margin-bottom:6px;display:block;}
+  .coachnote-card{border-left:4px solid #FFFFFF;margin-bottom:22px;}
+  .coachnote-card .card-body{white-space:pre-line;font-size:14px;line-height:1.6;}
+
+  /* day structure */
+  .day-header{font-family:var(--display);font-weight:800;font-size:16px;text-transform:uppercase;
+    letter-spacing:0.14em;color:var(--text-dim);margin:26px 0 10px;padding-bottom:7px;
+    border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .day-header:first-of-type{margin-top:4px;}
+  .day-header .day-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  .rest-day{background:var(--panel);border:1px dashed var(--border);border-radius:var(--radius);
+    padding:16px;margin-bottom:8px;color:var(--text-dim);font-size:13px;text-align:center;
+    font-style:italic;}
+  .readonly-banner{background:var(--panel-alt);border:1px solid var(--border);border-radius:8px;
+    padding:10px 14px;margin:14px 0 4px;font-size:12.5px;color:var(--text-dim);text-align:center;}
+
+  /* login gate */
+  #loginScreen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;
+    justify-content:center;padding:20px;z-index:100;}
+  .login-card{background:var(--panel-alt);clip-path:var(--pixel-clip-lg);padding:2px;
+    max-width:340px;width:100%;}
+  .login-card-inner{background:#000000;clip-path:var(--pixel-clip-lg);padding:28px 26px;}
+  .login-card .led-title-wrap{margin-bottom:22px;}
+  .login-card .led-title{gap:5px;}
+  .login-card .led-letter{max-width:28px;}
+  .login-card .subtitle{margin-bottom:20px;}
+  .login-card input{width:100%;background:var(--panel-alt);border:1px solid var(--border);
+    clip-path:var(--pixel-clip-sm);color:var(--text);padding:10px 12px;font-size:16px;margin-bottom:10px;
+    font-family:inherit;box-sizing:border-box;}
+  .login-card button{width:100%;background:var(--accent);color:#1a0d06;border:none;clip-path:var(--pixel-clip-sm);
+    padding:11px;font-weight:800;font-size:17px;cursor:pointer;font-family:var(--display);
+    letter-spacing:0.03em;text-transform:uppercase;margin-top:4px;}
+  .login-error{color:#FF8A6B;font-size:12.5px;margin-top:10px;min-height:16px;}
+  .demo-banner{background:#1E2A24;border:1px solid #2E4A3B;clip-path:var(--pixel-clip-lg);padding:10px 14px;
+    margin:16px 0 4px;font-size:12.5px;color:#8FD9AE;text-align:center;}
+  .logout-link{font-family:var(--mono);font-size:11px;color:var(--text-dim);cursor:pointer;
+    text-decoration:underline;display:inline-block;}
+  #pageFooter{text-align:center;padding:24px 18px 40px;}
+
+  /* section card */
+  .card{background:var(--panel-alt);clip-path:var(--pixel-clip-lg);padding:2px;
+    margin-bottom:14px;transition:background-color .15s ease;}
+  .card-inner{background:#000000;clip-path:var(--pixel-clip-lg);overflow:hidden;}
+  .card.session-done{background:var(--green);}
+  .card.session-done .card-head{background:rgba(127,216,88,0.5);}
+  .card.coaching-done{background:var(--coached);}
+  .card.coaching-done .card-head{background:rgba(181,101,245,0.5);}
+  .coach-day-toggle{display:flex;gap:8px;}
+  .coach-day-btn{flex:1;font-family:var(--display);font-weight:800;font-size:16px;
+    text-transform:uppercase;letter-spacing:0.04em;padding:9px 0;clip-path:var(--pixel-clip-sm);
+    background:var(--panel-alt);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;}
+  .coach-day-btn.selected{background:var(--coached);border-color:var(--coached);color:#1a0d2e;}
+  .session-check{width:18px;height:18px;accent-color:var(--green);flex-shrink:0;cursor:pointer;margin:0;}
+  .card-head{display:flex;flex-direction:column;gap:10px;padding:15px 16px;cursor:pointer;
+    user-select:none;}
+  .card-head-row{display:flex;align-items:center;gap:12px;}
+  .card-head:hover{background:var(--panel-alt);}
+  .code-tag{font-family:var(--mono);font-weight:700;font-size:11.5px;padding:4px 8px;border-radius:5px;
+    background:var(--accent-dim);color:#FFB199;letter-spacing:0.03em;white-space:nowrap;}
+  .card-icon{width:22px;height:22px;flex-shrink:0;fill:#FFFFFF;}
+  .card-title{font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;
+    letter-spacing:0.02em;flex:1;}
+  .card-time{font-family:var(--mono);font-size:12.5px;color:var(--text-dim);white-space:nowrap;}
+  .chevron{font-size:12px;color:var(--text-dim);transition:transform .15s ease;}
+  .card.open .chevron{transform:rotate(90deg);}
+  .card-body{display:none;padding:2px 16px 18px;border-top:1px solid var(--border);}
+  .card.open .card-body{display:block;}
+  .progress-pill{font-family:var(--mono);font-size:11px;color:var(--text-dim);}
+  .progress-pill.done{color:var(--green);}
+
+  /* drill */
+  .drill{padding:14px 0;border-bottom:1px solid var(--border);}
+  .drill:last-child{border-bottom:none;}
+  .drill-row{display:flex;align-items:flex-start;gap:10px;}
+  .drill input[type=checkbox]{margin-top:3px;width:17px;height:17px;accent-color:var(--green);flex-shrink:0;cursor:pointer;}
+  .drill-name{font-weight:700;font-size:14.5px;}
+  .drill-time{font-family:var(--mono);font-size:11.5px;color:var(--text-dim);margin-left:8px;}
+  .drill-desc{font-size:13.5px;color:var(--text-dim);margin-top:5px;line-height:1.55;}
+  .drill-actions{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .vid-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+    color:var(--blue);text-decoration:none;border:1px solid #2C4A57;background:#182428;
+    padding:6px 10px;border-radius:6px;}
+  .vid-btn:hover{background:#1c2e34;}
+  .vid-btn{cursor:pointer;font-family:inherit;}
+  .vid-embed{display:none;}
+  .vid-embed.open{display:block;margin-top:10px;position:relative;width:100%;max-width:420px;
+    aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000;border:1px solid var(--border);}
+  .vid-embed.open iframe{width:100%;height:100%;border:0;display:block;}
+  .vid-fallback{font-size:11.5px;color:var(--text-dim);margin-top:6px;}
+  .vid-fallback a{color:var(--blue);}
+
+  /* set tables (fingerboard / conditioning) */
+  .set-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px;}
+  .set-table th{text-align:left;font-family:var(--display);font-weight:700;font-size:14px;
+    text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);padding:6px 8px;
+    border-bottom:1px solid var(--border);}
+  .set-table td{padding:7px 8px;border-bottom:1px solid #26292E;}
+  .set-table tr.rest td{color:var(--text-dim);font-style:italic;font-size:12px;padding:4px 8px;}
+  .set-table input[type=text]{width:64px;background:var(--panel-alt);border:1px solid var(--border);
+    border-radius:5px;color:var(--text);padding:5px 6px;font-size:16px;font-family:var(--mono);}
+  .set-table input[type=checkbox]{accent-color:var(--green);width:16px;height:16px;cursor:pointer;}
+
+  /* projecting */
+  .goal-ladder{list-style:none;margin:10px 0;padding:0;counter-reset:goal;}
+  .goal-ladder li{counter-increment:goal;padding:8px 0 8px 30px;position:relative;font-size:13.5px;
+    border-bottom:1px solid #26292E;}
+  .goal-ladder li:last-child{border-bottom:none;}
+  .goal-ladder li::before{content:counter(goal);position:absolute;left:0;top:7px;width:20px;height:20px;
+    border-radius:50%;background:var(--panel-alt);border:1px solid var(--border);font-family:var(--mono);
+    font-size:11px;display:flex;align-items:center;justify-content:center;color:var(--text-dim);}
+  .journal{margin-top:14px;background:var(--panel-alt);border:1px solid var(--border);border-radius:8px;
+    padding:14px;}
+  .journal label{display:block;font-family:var(--display);font-weight:700;font-size:15px;
+    text-transform:uppercase;letter-spacing:0.05em;color:var(--accent);margin:10px 0 4px;}
+  .journal label:first-child{margin-top:0;}
+  .journal textarea{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:6px;
+    color:var(--text);padding:8px 10px;font-size:16px;font-family:inherit;resize:vertical;min-height:40px;}
+  .journal-save{margin-top:10px;background:var(--accent);color:#1a0d06;border:none;clip-path:var(--pixel-clip-sm);
+    padding:8px 14px;font-weight:700;font-size:16px;cursor:pointer;font-family:var(--display);
+    letter-spacing:0.03em;text-transform:uppercase;}
+  .journal-status{font-size:11.5px;color:var(--green);margin-left:10px;opacity:0;transition:opacity .2s;}
+  .form-link{font-size:12.5px;color:var(--blue);}
+
+  .deload-msg{background:var(--panel);border:1px solid var(--gold);clip-path:var(--pixel-clip-lg);
+    padding:20px;text-align:center;margin-top:10px;}
+  .deload-msg .big{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;
+    color:var(--gold);letter-spacing:0.03em;margin-bottom:6px;}
+  .deload-msg p{color:var(--text-dim);font-size:13.5px;line-height:1.6;max-width:480px;margin:0 auto;}
+
+  .fb-baseline-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .fb-baseline-label{display:block;font-family:var(--display);font-weight:700;font-size:12px;
+    text-transform:uppercase;letter-spacing:0.04em;color:var(--text-dim);margin-bottom:6px;}
+  .fb-baseline-input{width:100%;background:var(--panel-alt);border:1px solid var(--border);
+    clip-path:var(--pixel-clip-sm);color:var(--text);padding:9px 10px;font-size:16px;
+    font-family:var(--mono);box-sizing:border-box;}
+  .fb-bw-pct{font-family:var(--mono);font-size:12px;color:var(--text-dim);white-space:nowrap;}
+  .bench-entry{padding:8px 0;border-bottom:1px solid var(--border);}
+  .bench-entry:last-child{border-bottom:none;}
+  .bench-entry-date{font-family:var(--mono);font-size:11px;color:var(--text-dim);}
+  .bench-entry-detail{font-size:13px;margin-top:2px;}
+
+  .note-box{background:#241C15;border:1px solid #4A3620;clip-path:var(--pixel-clip-sm);padding:10px 12px;
+    font-size:12.5px;color:#D9B98A;margin:14px 0 4px;line-height:1.5;}
+
+  footer{max-width:920px;margin:30px auto 0;padding:0 18px;color:var(--text-dim);font-size:11.5px;
+    text-align:center;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="icon-wall" viewBox="0 0 24 24"><path d="M 3.86 3.64 L 3.75 14.53 L 17.17 21.35 L 17.94 21.35 L 20.03 20.25 L 20.14 18.27 L 19.26 17.83 L 20.14 17.28 L 20.14 15.41 L 19.26 14.75 L 20.14 14.31 L 20.14 12.33 L 19.26 11.78 L 20.14 11.23 L 20.14 9.36 L 6.72 2.54 L 5.95 2.54 Z M 19.81 18.93 L 19.92 19.04 L 19.92 19.70 L 19.70 19.92 L 19.48 19.92 L 19.48 20.03 L 19.37 20.14 L 19.15 20.14 L 18.93 20.36 L 18.71 20.36 L 18.49 20.58 L 18.38 20.58 L 18.27 20.69 L 18.05 20.69 L 18.05 20.80 L 17.94 20.91 L 17.83 20.80 L 17.83 20.03 L 17.94 19.92 L 18.05 19.92 L 18.27 19.70 L 18.38 19.70 L 18.49 19.59 L 18.60 19.59 L 18.82 19.37 L 19.15 19.37 L 19.48 19.04 L 19.59 19.04 L 19.70 18.93 Z M 15.30 19.04 L 15.41 18.93 L 15.52 19.04 L 15.63 19.04 L 15.74 19.15 L 15.85 19.15 L 15.96 19.26 L 16.07 19.26 L 16.18 19.37 L 16.29 19.37 L 16.40 19.48 L 16.51 19.48 L 16.62 19.59 L 16.73 19.59 L 16.95 19.81 L 17.06 19.81 L 17.17 19.92 L 17.28 19.92 L 17.39 20.03 L 17.39 20.80 L 17.28 20.91 L 17.17 20.91 L 16.95 20.69 L 16.84 20.69 L 16.73 20.58 L 16.62 20.58 L 16.51 20.47 L 16.40 20.47 L 16.29 20.36 L 16.18 20.36 L 16.07 20.25 L 15.96 20.25 L 15.85 20.14 L 15.74 20.14 L 15.63 20.03 L 15.52 20.03 L 15.30 19.81 Z M 16.62 18.16 L 16.84 18.16 L 16.95 18.27 L 17.06 18.27 L 17.39 18.60 L 17.39 19.37 L 17.28 19.48 L 17.06 19.26 L 16.95 19.26 L 16.84 19.15 L 16.73 19.15 L 16.51 18.93 L 16.51 18.27 Z M 18.82 18.05 L 18.93 18.16 L 18.93 18.82 L 18.71 19.04 L 18.60 19.04 L 18.49 19.15 L 18.38 19.15 L 18.16 19.37 L 18.05 19.37 L 17.94 19.48 L 17.83 19.37 L 17.83 18.60 L 17.94 18.49 L 18.05 18.49 L 18.38 18.16 L 18.60 18.16 L 18.71 18.05 Z M 12.77 17.83 L 12.88 17.72 L 12.99 17.72 L 13.10 17.83 L 13.21 17.83 L 13.32 17.94 L 13.43 17.94 L 13.54 18.05 L 13.65 18.05 L 13.76 18.16 L 13.87 18.16 L 13.98 18.27 L 14.20 18.27 L 14.42 18.49 L 14.53 18.49 L 14.64 18.60 L 14.75 18.60 L 14.86 18.71 L 14.86 19.59 L 14.75 19.70 L 14.53 19.48 L 14.42 19.48 L 14.31 19.37 L 14.20 19.37 L 14.09 19.26 L 13.98 19.26 L 13.87 19.15 L 13.76 19.15 L 13.65 19.04 L 13.54 19.04 L 13.32 18.82 L 13.21 18.82 L 13.10 18.71 L 12.99 18.71 L 12.77 18.49 Z M 14.09 16.95 L 14.20 16.84 L 14.31 16.95 L 14.42 16.95 L 14.53 17.06 L 14.64 17.06 L 14.75 17.17 L 14.86 17.17 L 14.97 17.28 L 15.08 17.28 L 15.19 17.39 L 15.30 17.39 L 15.52 17.61 L 15.74 17.61 L 15.96 17.83 L 16.07 17.83 L 16.18 17.94 L 16.18 18.71 L 16.07 18.82 L 15.96 18.71 L 15.74 18.71 L 15.52 18.49 L 15.41 18.49 L 15.30 18.38 L 15.19 18.38 L 15.08 18.27 L 14.97 18.27 L 14.75 18.05 L 14.53 18.05 L 14.42 17.94 L 14.31 17.94 L 14.09 17.72 Z M 10.24 16.51 L 10.35 16.40 L 10.46 16.51 L 10.57 16.51 L 10.68 16.62 L 10.79 16.62 L 10.90 16.73 L 11.01 16.73 L 11.12 16.84 L 11.34 16.84 L 11.56 17.06 L 11.78 17.06 L 12.00 17.28 L 12.11 17.28 L 12.22 17.39 L 12.33 17.39 L 12.44 17.50 L 12.44 18.27 L 12.33 18.38 L 12.22 18.27 L 12.00 18.27 L 11.89 18.16 L 11.78 18.16 L 11.56 17.94 L 11.34 17.94 L 11.12 17.72 L 11.01 17.72 L 10.90 17.61 L 10.68 17.61 L 10.46 17.39 L 10.35 17.39 L 10.24 17.28 Z M 19.92 16.18 L 19.92 16.84 L 19.70 17.06 L 19.48 17.06 L 19.15 17.39 L 18.93 17.39 L 18.82 17.50 L 18.71 17.50 L 18.60 17.61 L 18.49 17.61 L 18.49 17.72 L 18.38 17.83 L 18.05 17.83 L 17.94 17.94 L 17.83 17.83 L 17.83 17.17 L 17.94 17.06 L 18.05 17.06 L 18.27 16.84 L 18.49 16.84 L 18.60 16.73 L 18.71 16.73 L 18.93 16.51 L 19.04 16.51 L 19.26 16.29 L 19.37 16.29 L 19.48 16.18 L 19.59 16.18 L 19.70 16.07 L 19.81 16.07 Z M 15.30 16.07 L 15.41 15.96 L 15.52 15.96 L 15.74 16.18 L 15.96 16.18 L 16.18 16.40 L 16.29 16.40 L 16.40 16.51 L 16.62 16.51 L 16.73 16.62 L 16.73 16.73 L 16.95 16.73 L 17.06 16.84 L 17.17 16.84 L 17.39 17.06 L 17.39 17.83 L 17.28 17.94 L 17.17 17.83 L 17.06 17.83 L 16.95 17.72 L 16.84 17.72 L 16.73 17.61 L 16.62 17.61 L 16.51 17.50 L 16.40 17.50 L 16.29 17.39 L 16.18 17.39 L 16.07 17.28 L 15.96 17.28 L 15.85 17.17 L 15.74 17.17 L 15.63 17.06 L 15.52 17.06 L 15.30 16.84 Z M 19.26 15.63 L 19.37 15.52 L 19.48 15.63 L 19.37 15.74 Z M 11.56 15.63 L 11.67 15.52 L 11.89 15.74 L 12.00 15.74 L 12.11 15.85 L 12.33 15.85 L 12.55 16.07 L 12.66 16.07 L 12.77 16.18 L 12.88 16.18 L 12.99 16.29 L 13.10 16.29 L 13.21 16.40 L 13.32 16.40 L 13.43 16.51 L 13.54 16.51 L 13.76 16.73 L 13.76 17.50 L 13.65 17.61 L 13.54 17.50 L 13.43 17.50 L 13.32 17.39 L 13.21 17.39 L 13.10 17.28 L 12.99 17.28 L 12.88 17.17 L 12.77 17.17 L 12.55 16.95 L 12.33 16.95 L 12.22 16.84 L 12.11 16.84 L 12.00 16.73 L 11.89 16.73 L 11.78 16.62 L 11.67 16.62 L 11.56 16.51 Z M 16.73 15.19 L 16.84 15.19 L 16.95 15.30 L 17.06 15.30 L 17.17 15.41 L 17.28 15.41 L 17.39 15.52 L 17.39 16.29 L 17.28 16.40 L 17.17 16.40 L 17.06 16.29 L 16.95 16.29 L 16.84 16.18 L 16.73 16.18 L 16.62 16.07 L 16.62 15.30 Z M 7.71 15.19 L 7.82 15.08 L 8.04 15.30 L 8.15 15.30 L 8.26 15.41 L 8.48 15.41 L 8.70 15.63 L 8.92 15.63 L 9.03 15.74 L 9.14 15.74 L 9.25 15.85 L 9.25 15.96 L 9.58 15.96 L 9.91 16.29 L 9.91 17.06 L 9.80 17.17 L 9.58 16.95 L 9.36 16.95 L 9.25 16.84 L 9.14 16.84 L 8.92 16.62 L 8.81 16.62 L 8.70 16.51 L 8.59 16.51 L 8.48 16.40 L 8.26 16.40 L 8.15 16.29 L 8.15 16.18 L 7.93 16.18 L 7.71 15.96 Z M 18.82 14.97 L 18.93 15.08 L 18.93 15.96 L 18.82 16.07 L 18.71 16.07 L 18.60 16.18 L 18.49 16.18 L 18.27 16.40 L 18.16 16.40 L 18.05 16.51 L 17.94 16.51 L 17.83 16.40 L 17.83 15.63 L 18.16 15.30 L 18.38 15.30 L 18.71 14.97 Z M 12.88 14.86 L 12.99 14.75 L 13.10 14.75 L 13.21 14.86 L 13.32 14.86 L 13.54 15.08 L 13.76 15.08 L 13.98 15.30 L 14.09 15.30 L 14.20 15.41 L 14.42 15.41 L 14.64 15.63 L 14.75 15.63 L 14.97 15.85 L 14.97 16.62 L 14.86 16.73 L 14.75 16.62 L 14.64 16.62 L 14.53 16.51 L 14.42 16.51 L 14.20 16.29 L 13.98 16.29 L 13.87 16.18 L 13.76 16.18 L 13.65 16.07 L 13.54 16.07 L 13.43 15.96 L 13.32 15.96 L 13.21 15.85 L 13.10 15.85 L 12.88 15.63 Z M 9.03 14.42 L 9.14 14.31 L 9.25 14.31 L 9.36 14.42 L 9.47 14.42 L 9.58 14.53 L 9.69 14.53 L 9.80 14.64 L 9.91 14.64 L 10.13 14.86 L 10.35 14.86 L 10.46 14.97 L 10.57 14.97 L 10.79 15.19 L 10.90 15.19 L 11.01 15.30 L 11.12 15.30 L 11.23 15.41 L 11.23 16.18 L 11.12 16.29 L 11.01 16.18 L 10.79 16.18 L 10.68 16.07 L 10.57 16.07 L 10.46 15.96 L 10.35 15.96 L 10.24 15.85 L 10.13 15.85 L 10.02 15.74 L 9.91 15.74 L 9.69 15.52 L 9.47 15.52 L 9.03 15.08 Z M 5.29 14.09 L 5.40 13.98 L 5.62 13.98 L 5.84 14.20 L 5.95 14.20 L 6.06 14.31 L 6.28 14.31 L 6.50 14.53 L 6.72 14.53 L 6.94 14.75 L 7.05 14.75 L 7.16 14.86 L 7.27 14.86 L 7.49 15.08 L 7.49 15.74 L 7.38 15.85 L 7.27 15.85 L 7.16 15.74 L 6.94 15.74 L 6.83 15.63 L 6.83 15.52 L 6.61 15.52 L 6.50 15.41 L 6.39 15.41 L 6.28 15.30 L 6.17 15.30 L 6.06 15.19 L 5.95 15.19 L 5.84 15.08 L 5.73 15.08 L 5.62 14.97 L 5.51 14.97 L 5.29 14.75 Z M 14.09 13.98 L 14.20 13.87 L 14.31 13.98 L 14.53 13.98 L 14.64 14.09 L 14.75 14.09 L 14.97 14.31 L 15.19 14.31 L 15.41 14.53 L 15.52 14.53 L 15.74 14.75 L 15.96 14.75 L 16.07 14.86 L 16.18 14.86 L 16.29 14.97 L 16.29 15.74 L 16.18 15.85 L 16.07 15.85 L 15.85 15.63 L 15.74 15.63 L 15.63 15.52 L 15.41 15.52 L 15.30 15.41 L 15.19 15.41 L 15.08 15.30 L 14.97 15.30 L 14.75 15.08 L 14.53 15.08 L 14.42 14.97 L 14.31 14.97 L 14.09 14.75 Z M 10.35 13.54 L 10.46 13.43 L 10.68 13.65 L 10.90 13.65 L 11.23 13.98 L 11.56 13.98 L 11.78 14.20 L 11.89 14.20 L 12.00 14.31 L 12.22 14.31 L 12.55 14.64 L 12.55 15.41 L 12.44 15.52 L 12.33 15.41 L 12.22 15.41 L 12.00 15.19 L 11.89 15.19 L 11.78 15.08 L 11.56 15.08 L 11.34 14.86 L 11.12 14.86 L 11.01 14.75 L 10.90 14.75 L 10.68 14.53 L 10.57 14.53 L 10.35 14.31 Z M 4.08 13.21 L 4.19 13.32 L 4.30 13.32 L 4.41 13.43 L 4.52 13.43 L 4.74 13.65 L 4.85 13.65 L 4.96 13.76 L 4.96 14.53 L 4.85 14.64 L 4.74 14.53 L 4.63 14.53 L 4.41 14.31 L 4.30 14.31 L 4.19 14.20 L 4.08 14.20 L 3.97 14.09 L 3.97 13.32 Z M 19.92 13.21 L 19.92 13.76 L 19.59 14.09 L 19.48 14.09 L 19.37 14.20 L 19.26 14.20 L 19.04 14.42 L 18.82 14.42 L 18.60 14.64 L 18.49 14.64 L 18.38 14.75 L 18.27 14.75 L 18.16 14.86 L 18.05 14.86 L 17.94 14.97 L 17.83 14.86 L 17.83 14.09 L 17.94 13.98 L 18.16 13.98 L 18.38 13.76 L 18.49 13.76 L 18.60 13.65 L 18.71 13.65 L 18.82 13.54 L 18.93 13.54 L 19.04 13.43 L 19.15 13.43 L 19.37 13.21 L 19.48 13.21 L 19.59 13.10 L 19.81 13.10 Z M 15.41 13.21 L 15.52 13.10 L 15.63 13.10 L 15.74 13.21 L 15.85 13.21 L 15.96 13.32 L 16.07 13.32 L 16.18 13.43 L 16.29 13.43 L 16.40 13.54 L 16.51 13.54 L 16.62 13.65 L 16.73 13.65 L 16.84 13.76 L 17.06 13.76 L 17.39 14.09 L 17.39 14.86 L 17.28 14.97 L 17.17 14.86 L 17.06 14.86 L 16.95 14.75 L 16.84 14.75 L 16.73 14.64 L 16.62 14.64 L 16.51 14.53 L 16.40 14.53 L 16.29 14.42 L 16.18 14.42 L 16.07 14.31 L 15.96 14.31 L 15.74 14.09 L 15.52 14.09 L 15.41 13.98 Z M 6.50 13.10 L 6.61 12.99 L 6.72 13.10 L 6.94 13.10 L 7.27 13.43 L 7.49 13.43 L 7.60 13.54 L 7.71 13.54 L 7.82 13.65 L 7.93 13.65 L 8.04 13.76 L 8.15 13.76 L 8.26 13.87 L 8.37 13.87 L 8.48 13.98 L 8.59 13.98 L 8.70 14.09 L 8.70 14.86 L 8.59 14.97 L 8.37 14.97 L 8.15 14.75 L 7.93 14.75 L 7.82 14.64 L 7.71 14.64 L 7.49 14.42 L 7.38 14.42 L 7.27 14.31 L 7.16 14.31 L 7.05 14.20 L 6.94 14.20 L 6.83 14.09 L 6.72 14.09 L 6.50 13.87 Z M 11.67 12.77 L 11.78 12.66 L 11.89 12.66 L 12.11 12.88 L 12.22 12.88 L 12.33 12.99 L 12.55 12.99 L 12.77 13.21 L 12.88 13.21 L 12.99 13.32 L 13.21 13.32 L 13.43 13.54 L 13.54 13.54 L 13.76 13.76 L 13.76 14.53 L 13.65 14.64 L 13.54 14.53 L 13.43 14.53 L 13.32 14.42 L 13.21 14.42 L 12.99 14.20 L 12.77 14.20 L 12.66 14.09 L 12.55 14.09 L 12.44 13.98 L 12.33 13.98 L 12.22 13.87 L 12.11 13.87 L 11.89 13.65 L 11.78 13.65 L 11.67 13.54 Z M 19.26 12.55 L 19.37 12.44 L 19.59 12.66 L 19.48 12.77 L 19.37 12.77 L 19.26 12.66 Z M 16.73 12.22 L 16.95 12.22 L 17.06 12.33 L 17.17 12.33 L 17.39 12.55 L 17.39 13.32 L 17.28 13.43 L 17.17 13.32 L 16.95 13.32 L 16.62 12.99 L 16.62 12.33 Z M 7.82 12.33 L 7.93 12.22 L 8.04 12.22 L 8.15 12.33 L 8.26 12.33 L 8.37 12.44 L 8.48 12.44 L 8.59 12.55 L 8.70 12.55 L 8.81 12.66 L 8.92 12.66 L 9.14 12.88 L 9.36 12.88 L 9.47 12.99 L 9.58 12.99 L 9.69 13.10 L 9.80 13.10 L 10.02 13.32 L 10.02 14.09 L 9.91 14.20 L 9.80 14.09 L 9.69 14.09 L 9.58 13.98 L 9.47 13.98 L 9.36 13.87 L 9.25 13.87 L 9.14 13.76 L 9.03 13.76 L 8.92 13.65 L 8.81 13.65 L 8.70 13.54 L 8.59 13.54 L 8.48 13.43 L 8.37 13.43 L 8.26 13.32 L 8.15 13.32 L 7.82 12.99 Z M 18.82 12.00 L 18.93 12.11 L 18.93 12.99 L 18.82 13.10 L 18.71 13.10 L 18.60 13.21 L 18.49 13.21 L 18.38 13.32 L 18.27 13.32 L 18.16 13.43 L 18.05 13.43 L 17.94 13.54 L 17.83 13.43 L 17.83 12.55 L 18.05 12.33 L 18.16 12.33 L 18.27 12.22 L 18.38 12.22 L 18.60 12.00 Z M 12.99 11.89 L 13.10 11.78 L 13.32 12.00 L 13.54 12.00 L 13.65 12.11 L 13.76 12.11 L 13.98 12.33 L 14.09 12.33 L 14.20 12.44 L 14.31 12.44 L 14.42 12.55 L 14.64 12.55 L 14.86 12.77 L 14.97 12.77 L 15.08 12.88 L 15.08 13.65 L 14.97 13.76 L 14.86 13.76 L 14.75 13.65 L 14.64 13.65 L 14.42 13.43 L 14.31 13.43 L 14.20 13.32 L 14.09 13.32 L 13.98 13.21 L 13.87 13.21 L 13.76 13.10 L 13.65 13.10 L 13.54 12.99 L 13.32 12.99 L 12.99 12.66 Z M 3.97 11.78 L 4.08 11.67 L 4.30 11.89 L 4.41 11.89 L 4.52 12.00 L 4.63 12.00 L 4.74 12.11 L 4.85 12.11 L 4.96 12.22 L 5.07 12.22 L 5.18 12.33 L 5.29 12.33 L 5.40 12.44 L 5.51 12.44 L 5.62 12.55 L 5.73 12.55 L 5.84 12.66 L 5.95 12.66 L 6.17 12.88 L 6.17 12.99 L 6.28 13.10 L 6.28 13.54 L 6.06 13.76 L 5.95 13.65 L 5.84 13.65 L 5.73 13.54 L 5.62 13.54 L 5.51 13.43 L 5.40 13.43 L 5.29 13.32 L 5.07 13.32 L 4.96 13.21 L 4.85 13.21 L 4.63 12.99 L 4.52 12.99 L 4.41 12.88 L 4.30 12.88 L 3.97 12.55 Z M 9.14 11.45 L 9.25 11.34 L 9.36 11.45 L 9.58 11.45 L 9.69 11.56 L 9.69 11.67 L 9.91 11.67 L 10.02 11.78 L 10.13 11.78 L 10.24 11.89 L 10.35 11.89 L 10.46 12.00 L 10.57 12.00 L 10.68 12.11 L 10.79 12.11 L 10.90 12.22 L 11.01 12.22 L 11.34 12.55 L 11.34 13.21 L 11.23 13.32 L 11.01 13.32 L 10.90 13.21 L 10.79 13.21 L 10.57 12.99 L 10.35 12.99 L 10.13 12.77 L 10.02 12.77 L 9.91 12.66 L 9.80 12.66 L 9.69 12.55 L 9.58 12.55 L 9.47 12.44 L 9.36 12.44 L 9.14 12.22 Z M 14.31 11.12 L 14.42 11.01 L 14.53 11.01 L 14.64 11.12 L 14.75 11.12 L 14.86 11.23 L 14.97 11.23 L 15.08 11.34 L 15.19 11.34 L 15.41 11.56 L 15.52 11.56 L 15.63 11.67 L 15.74 11.67 L 15.85 11.78 L 16.07 11.78 L 16.29 12.00 L 16.29 12.77 L 16.18 12.88 L 16.07 12.77 L 15.85 12.77 L 15.63 12.55 L 15.52 12.55 L 15.41 12.44 L 15.19 12.44 L 14.97 12.22 L 14.75 12.22 L 14.64 12.11 L 14.53 12.11 L 14.31 11.89 Z M 5.29 11.01 L 5.40 10.90 L 5.51 10.90 L 5.73 11.12 L 5.84 11.12 L 5.95 11.23 L 6.06 11.23 L 6.17 11.34 L 6.28 11.34 L 6.39 11.45 L 6.50 11.45 L 6.61 11.56 L 6.72 11.56 L 6.83 11.67 L 6.94 11.67 L 7.16 11.89 L 7.27 11.89 L 7.49 12.11 L 7.49 12.77 L 7.38 12.88 L 7.27 12.77 L 6.94 12.77 L 6.72 12.55 L 6.61 12.55 L 6.50 12.44 L 6.39 12.44 L 6.17 12.22 L 5.84 12.22 L 5.62 12.00 L 5.51 12.00 L 5.29 11.78 Z M 10.57 10.68 L 10.68 10.57 L 10.79 10.68 L 10.90 10.68 L 11.01 10.79 L 11.12 10.79 L 11.23 10.90 L 11.34 10.90 L 11.45 11.01 L 11.56 11.01 L 11.67 11.12 L 11.78 11.12 L 11.89 11.23 L 12.00 11.23 L 12.22 11.45 L 12.44 11.45 L 12.55 11.56 L 12.55 11.78 L 12.66 11.89 L 12.66 12.44 L 12.55 12.55 L 12.44 12.44 L 12.33 12.44 L 12.22 12.33 L 12.00 12.33 L 11.89 12.22 L 11.78 12.22 L 11.56 12.00 L 11.45 12.00 L 11.34 11.89 L 11.12 11.89 L 10.79 11.56 L 10.68 11.56 L 10.57 11.45 Z M 4.08 10.24 L 4.19 10.35 L 4.30 10.35 L 4.41 10.46 L 4.52 10.46 L 4.63 10.57 L 4.74 10.57 L 4.96 10.79 L 4.96 11.45 L 4.85 11.56 L 4.63 11.56 L 4.41 11.34 L 4.30 11.34 L 4.19 11.23 L 4.08 11.23 L 3.97 11.12 L 3.97 10.35 Z M 15.52 10.24 L 15.63 10.13 L 15.74 10.24 L 15.85 10.24 L 15.96 10.35 L 16.18 10.35 L 16.40 10.57 L 16.62 10.57 L 16.84 10.79 L 16.95 10.79 L 17.06 10.90 L 17.17 10.90 L 17.39 11.12 L 17.39 11.89 L 17.28 12.00 L 17.06 11.78 L 16.95 11.78 L 16.84 11.67 L 16.73 11.67 L 16.62 11.56 L 16.40 11.56 L 16.18 11.34 L 16.07 11.34 L 15.96 11.23 L 15.74 11.23 L 15.63 11.12 L 15.63 11.01 L 15.52 10.90 Z M 6.61 10.24 L 6.72 10.13 L 6.83 10.13 L 7.05 10.35 L 7.38 10.35 L 7.60 10.57 L 7.71 10.57 L 7.82 10.68 L 7.93 10.68 L 8.15 10.90 L 8.37 10.90 L 8.48 11.01 L 8.59 11.01 L 8.81 11.23 L 8.81 12.00 L 8.70 12.11 L 8.59 12.00 L 8.48 12.00 L 8.37 11.89 L 8.26 11.89 L 8.15 11.78 L 7.93 11.78 L 7.71 11.56 L 7.60 11.56 L 7.49 11.45 L 7.38 11.45 L 7.27 11.34 L 7.16 11.34 L 7.05 11.23 L 6.94 11.23 L 6.83 11.12 L 6.72 11.12 L 6.61 11.01 Z M 19.92 10.13 L 19.92 10.79 L 19.81 10.90 L 19.70 10.90 L 19.48 11.12 L 19.37 11.12 L 19.26 11.23 L 19.15 11.23 L 19.04 11.34 L 18.93 11.34 L 18.71 11.56 L 18.60 11.56 L 18.49 11.67 L 18.27 11.67 L 18.05 11.89 L 17.94 11.89 L 17.83 11.78 L 17.83 11.12 L 18.05 10.90 L 18.27 10.90 L 18.60 10.57 L 18.71 10.57 L 18.82 10.46 L 19.04 10.46 L 19.26 10.24 L 19.37 10.24 L 19.48 10.13 L 19.59 10.13 L 19.70 10.02 L 19.81 10.02 Z M 11.89 9.91 L 12.00 9.80 L 12.11 9.80 L 12.22 9.91 L 12.33 9.91 L 12.44 10.02 L 12.66 10.02 L 12.99 10.35 L 13.32 10.35 L 13.54 10.57 L 13.65 10.57 L 13.76 10.68 L 13.87 10.68 L 13.98 10.79 L 13.98 11.56 L 13.87 11.67 L 13.76 11.67 L 13.65 11.56 L 13.43 11.56 L 13.21 11.34 L 13.10 11.34 L 12.99 11.23 L 12.77 11.23 L 12.55 11.01 L 12.44 11.01 L 12.33 10.90 L 12.22 10.90 L 11.89 10.57 Z M 8.37 9.58 L 8.48 9.47 L 8.59 9.58 L 8.70 9.58 L 8.81 9.69 L 9.03 9.69 L 9.14 9.80 L 9.25 9.80 L 9.47 10.02 L 9.58 10.02 L 9.69 10.13 L 9.91 10.13 L 10.24 10.46 L 10.24 11.23 L 10.13 11.34 L 10.02 11.23 L 9.91 11.23 L 9.80 11.12 L 9.69 11.12 L 9.58 11.01 L 9.47 11.01 L 9.25 10.79 L 9.03 10.79 L 8.92 10.68 L 8.81 10.68 L 8.70 10.57 L 8.59 10.57 L 8.37 10.35 Z M 18.38 9.69 L 18.60 9.47 L 18.82 9.47 L 18.93 9.36 L 19.15 9.36 L 19.26 9.47 L 19.48 9.47 L 19.59 9.58 L 19.48 9.69 L 19.37 9.69 L 19.26 9.80 L 19.15 9.80 L 19.04 9.91 L 18.93 9.91 L 18.82 10.02 L 18.71 9.91 L 18.60 9.91 Z M 16.07 9.69 L 16.29 9.47 L 16.40 9.47 L 16.51 9.36 L 16.62 9.36 L 16.73 9.47 L 16.95 9.47 L 17.06 9.58 L 17.17 9.58 L 17.28 9.69 L 17.39 9.69 L 17.50 9.80 L 17.61 9.80 L 17.83 10.02 L 18.05 10.02 L 18.27 10.24 L 18.05 10.46 L 17.94 10.46 L 17.83 10.57 L 17.39 10.57 L 17.28 10.46 L 17.17 10.46 L 16.95 10.24 L 16.73 10.24 L 16.62 10.13 L 16.51 10.13 L 16.40 10.02 L 16.29 10.02 L 16.07 9.80 Z M 13.21 9.03 L 13.32 8.92 L 13.54 9.14 L 13.76 9.14 L 13.98 9.36 L 14.09 9.36 L 14.20 9.47 L 14.31 9.47 L 14.42 9.58 L 14.53 9.58 L 14.64 9.69 L 14.86 9.69 L 15.19 10.02 L 15.19 10.68 L 15.08 10.79 L 14.97 10.79 L 14.86 10.68 L 14.75 10.68 L 14.64 10.57 L 14.53 10.57 L 14.42 10.46 L 14.31 10.46 L 14.09 10.24 L 13.87 10.24 L 13.76 10.13 L 13.65 10.13 L 13.54 10.02 L 13.43 10.02 L 13.21 9.80 Z M 3.97 8.92 L 4.08 8.81 L 4.19 8.81 L 4.30 8.92 L 4.41 8.92 L 4.52 9.03 L 4.63 9.03 L 4.74 9.14 L 4.96 9.14 L 5.07 9.25 L 5.18 9.25 L 5.29 9.36 L 5.40 9.36 L 5.51 9.47 L 5.62 9.47 L 5.84 9.69 L 6.06 9.69 L 6.28 9.91 L 6.28 10.68 L 6.17 10.79 L 6.06 10.68 L 5.84 10.68 L 5.73 10.57 L 5.62 10.57 L 5.51 10.46 L 5.40 10.46 L 5.29 10.35 L 5.18 10.35 L 5.07 10.24 L 4.96 10.24 L 4.74 10.02 L 4.63 10.02 L 4.52 9.91 L 4.30 9.91 L 3.97 9.58 Z M 9.58 8.70 L 9.69 8.59 L 9.80 8.59 L 10.02 8.81 L 10.13 8.81 L 10.24 8.92 L 10.46 8.92 L 10.68 9.14 L 10.90 9.14 L 11.12 9.36 L 11.23 9.36 L 11.34 9.47 L 11.45 9.47 L 11.56 9.58 L 11.56 10.35 L 11.45 10.46 L 11.34 10.46 L 11.12 10.24 L 10.79 10.24 L 10.68 10.13 L 10.68 10.02 L 10.46 10.02 L 10.24 9.80 L 10.13 9.80 L 10.02 9.69 L 9.80 9.69 L 9.58 9.47 Z M 5.84 8.37 L 5.95 8.26 L 6.17 8.26 L 6.28 8.37 L 6.39 8.37 L 6.61 8.59 L 6.83 8.59 L 6.94 8.70 L 7.05 8.70 L 7.27 8.92 L 7.49 8.92 L 7.71 9.14 L 7.82 9.14 L 8.04 9.36 L 8.04 10.13 L 7.93 10.24 L 7.82 10.13 L 7.71 10.13 L 7.60 10.02 L 7.49 10.02 L 7.38 9.91 L 7.27 9.91 L 7.05 9.69 L 6.83 9.69 L 6.72 9.58 L 6.61 9.58 L 6.39 9.36 L 6.06 9.36 L 5.95 9.25 L 5.95 9.14 L 5.84 9.03 Z M 16.07 8.48 L 16.29 8.26 L 16.40 8.26 L 16.51 8.15 L 16.84 8.15 L 16.95 8.26 L 17.06 8.26 L 17.17 8.37 L 17.28 8.37 L 17.39 8.48 L 17.50 8.48 L 17.61 8.59 L 17.72 8.59 L 17.83 8.70 L 17.94 8.70 L 18.05 8.81 L 18.16 8.81 L 18.27 8.92 L 18.38 8.92 L 18.49 9.03 L 18.27 9.25 L 18.16 9.25 L 18.05 9.36 L 17.61 9.36 L 17.50 9.25 L 17.39 9.25 L 17.28 9.14 L 17.17 9.14 L 17.06 9.03 L 16.84 9.03 L 16.62 8.81 L 16.40 8.81 Z M 13.54 8.59 L 13.65 8.48 L 13.76 8.48 L 13.87 8.37 L 13.98 8.37 L 14.20 8.15 L 14.42 8.15 L 14.64 8.37 L 14.75 8.37 L 14.86 8.48 L 14.97 8.48 L 15.08 8.59 L 15.19 8.59 L 15.30 8.70 L 15.41 8.70 L 15.52 8.81 L 15.63 8.81 L 15.74 8.92 L 15.85 8.92 L 16.07 9.14 L 15.85 9.36 L 15.52 9.36 L 15.41 9.47 L 15.30 9.47 L 15.19 9.36 L 14.97 9.36 L 14.86 9.25 L 14.75 9.25 L 14.53 9.03 L 14.31 9.03 L 14.09 8.81 L 13.98 8.81 L 13.87 8.70 L 13.65 8.70 Z M 10.79 7.82 L 10.90 7.71 L 11.01 7.82 L 11.12 7.82 L 11.34 8.04 L 11.56 8.04 L 11.67 8.15 L 11.78 8.15 L 11.89 8.26 L 12.00 8.26 L 12.22 8.48 L 12.33 8.48 L 12.44 8.59 L 12.66 8.59 L 12.88 8.81 L 12.88 9.47 L 12.77 9.58 L 12.55 9.58 L 12.44 9.47 L 12.33 9.47 L 12.22 9.36 L 12.11 9.36 L 11.89 9.14 L 11.78 9.14 L 11.67 9.03 L 11.45 9.03 L 11.23 8.81 L 11.12 8.81 L 11.01 8.70 L 10.90 8.70 L 10.79 8.59 Z M 7.27 7.49 L 7.38 7.38 L 7.49 7.49 L 7.60 7.49 L 7.71 7.60 L 7.82 7.60 L 7.93 7.71 L 8.04 7.71 L 8.15 7.82 L 8.26 7.82 L 8.48 8.04 L 8.70 8.04 L 8.81 8.15 L 8.92 8.15 L 9.25 8.48 L 9.25 9.25 L 9.14 9.36 L 9.03 9.25 L 8.92 9.25 L 8.70 9.03 L 8.48 9.03 L 8.37 8.92 L 8.26 8.92 L 8.04 8.70 L 7.82 8.70 L 7.60 8.48 L 7.49 8.48 L 7.27 8.26 Z M 3.97 7.38 L 4.08 7.27 L 4.19 7.27 L 4.30 7.38 L 4.41 7.38 L 4.52 7.49 L 4.74 7.49 L 4.96 7.71 L 5.07 7.71 L 5.18 7.82 L 5.29 7.82 L 5.40 7.93 L 5.51 7.93 L 5.62 8.04 L 5.62 8.92 L 5.51 9.03 L 5.29 8.81 L 5.07 8.81 L 4.96 8.70 L 4.85 8.70 L 4.63 8.48 L 4.52 8.48 L 4.41 8.37 L 4.30 8.37 L 3.97 8.04 Z M 11.23 7.38 L 11.34 7.27 L 11.45 7.27 L 11.56 7.16 L 11.67 7.16 L 11.78 7.05 L 12.22 7.05 L 12.33 7.16 L 12.44 7.16 L 12.55 7.27 L 12.66 7.27 L 12.77 7.38 L 12.88 7.38 L 13.10 7.60 L 13.32 7.60 L 13.43 7.71 L 13.54 7.71 L 13.76 7.93 L 13.65 8.04 L 13.54 8.04 L 13.43 8.15 L 13.32 8.15 L 13.21 8.26 L 12.88 8.26 L 12.77 8.15 L 12.55 8.15 L 12.33 7.93 L 12.22 7.93 L 12.11 7.82 L 12.00 7.82 L 11.89 7.71 L 11.67 7.71 L 11.56 7.60 L 11.45 7.60 Z M 13.65 7.27 L 13.76 7.16 L 13.98 7.16 L 14.09 7.05 L 14.20 7.05 L 14.31 6.94 L 14.42 6.94 L 14.53 7.05 L 14.64 7.05 L 14.75 7.16 L 14.86 7.16 L 14.97 7.27 L 15.08 7.27 L 15.19 7.38 L 15.41 7.38 L 15.63 7.60 L 15.74 7.60 L 15.85 7.71 L 15.96 7.71 L 16.07 7.82 L 15.85 8.04 L 15.74 8.04 L 15.52 8.26 L 15.41 8.26 L 15.30 8.15 L 15.19 8.15 L 15.08 8.04 L 14.97 8.04 L 14.86 7.93 L 14.75 7.93 L 14.64 7.82 L 14.53 7.82 L 14.42 7.71 L 14.31 7.71 L 14.09 7.49 L 13.98 7.49 L 13.87 7.38 L 13.76 7.38 Z M 8.48 6.72 L 8.59 6.61 L 8.81 6.61 L 9.03 6.83 L 9.14 6.83 L 9.25 6.94 L 9.36 6.94 L 9.47 7.05 L 9.58 7.05 L 9.69 7.16 L 9.91 7.16 L 10.13 7.38 L 10.24 7.38 L 10.46 7.60 L 10.46 8.37 L 10.35 8.48 L 10.13 8.26 L 9.91 8.26 L 9.80 8.15 L 9.69 8.15 L 9.47 7.93 L 9.36 7.93 L 9.25 7.82 L 9.14 7.82 L 9.03 7.71 L 8.81 7.71 L 8.48 7.38 Z M 4.96 6.39 L 5.07 6.28 L 5.18 6.28 L 5.29 6.39 L 5.40 6.39 L 5.62 6.61 L 5.84 6.61 L 5.95 6.72 L 6.06 6.72 L 6.17 6.83 L 6.28 6.83 L 6.39 6.94 L 6.50 6.94 L 6.72 7.16 L 6.83 7.16 L 6.94 7.27 L 6.94 8.04 L 6.83 8.15 L 6.72 8.04 L 6.61 8.04 L 6.50 7.93 L 6.39 7.93 L 6.17 7.71 L 5.95 7.71 L 5.84 7.60 L 5.73 7.60 L 5.62 7.49 L 5.51 7.49 L 5.40 7.38 L 5.29 7.38 L 5.18 7.27 L 5.07 7.27 L 4.96 7.16 Z M 8.92 6.17 L 9.03 6.06 L 9.25 6.06 L 9.47 5.84 L 9.80 5.84 L 9.91 5.95 L 10.02 5.95 L 10.13 6.06 L 10.24 6.06 L 10.35 6.17 L 10.46 6.17 L 10.57 6.28 L 10.68 6.28 L 10.79 6.39 L 10.90 6.39 L 11.01 6.50 L 11.12 6.50 L 11.23 6.61 L 11.34 6.61 L 11.45 6.72 L 11.34 6.83 L 11.23 6.83 L 11.12 6.94 L 11.01 6.94 L 10.90 7.05 L 10.79 7.05 L 10.68 7.16 L 10.57 7.05 L 10.46 7.05 L 10.35 6.94 L 10.24 6.94 L 10.02 6.72 L 9.91 6.72 L 9.80 6.61 L 9.58 6.61 L 9.36 6.39 L 9.25 6.39 L 9.14 6.28 L 9.03 6.28 Z M 11.45 6.06 L 11.67 5.84 L 11.89 5.84 L 12.00 5.73 L 12.11 5.84 L 12.33 5.84 L 12.44 5.95 L 12.55 5.95 L 12.66 6.06 L 12.77 6.06 L 12.88 6.17 L 12.99 6.17 L 13.10 6.28 L 13.21 6.28 L 13.43 6.50 L 13.65 6.50 L 13.76 6.61 L 13.54 6.83 L 13.43 6.83 L 13.21 7.05 L 13.10 7.05 L 12.99 6.94 L 12.88 6.94 L 12.77 6.83 L 12.55 6.83 L 12.44 6.72 L 12.33 6.72 L 12.11 6.50 L 11.89 6.50 L 11.78 6.39 L 11.78 6.28 L 11.56 6.28 L 11.45 6.17 Z M 4.08 5.73 L 4.19 5.84 L 4.30 5.84 L 4.41 5.95 L 4.52 5.95 L 4.63 6.06 L 4.63 6.83 L 4.52 6.94 L 4.41 6.83 L 4.30 6.83 L 4.19 6.72 L 4.08 6.72 L 3.97 6.61 L 3.97 5.84 Z M 6.17 5.51 L 6.28 5.40 L 6.39 5.51 L 6.61 5.51 L 6.72 5.62 L 6.83 5.62 L 6.94 5.73 L 7.05 5.73 L 7.16 5.84 L 7.27 5.84 L 7.49 6.06 L 7.71 6.06 L 7.82 6.17 L 7.93 6.17 L 8.15 6.39 L 8.15 7.16 L 8.04 7.27 L 7.93 7.16 L 7.82 7.16 L 7.71 7.05 L 7.60 7.05 L 7.49 6.94 L 7.38 6.94 L 7.27 6.83 L 7.16 6.83 L 7.05 6.72 L 6.94 6.72 L 6.83 6.61 L 6.72 6.61 L 6.61 6.50 L 6.39 6.50 L 6.28 6.39 L 6.28 6.28 L 6.17 6.17 Z M 6.61 4.96 L 6.72 4.85 L 6.83 4.85 L 6.94 4.74 L 7.05 4.74 L 7.16 4.63 L 7.38 4.63 L 7.49 4.74 L 7.60 4.74 L 7.71 4.85 L 7.82 4.85 L 7.93 4.96 L 8.15 4.96 L 8.37 5.18 L 8.59 5.18 L 8.70 5.29 L 8.81 5.29 L 9.03 5.51 L 9.03 5.62 L 8.92 5.73 L 8.70 5.73 L 8.48 5.95 L 8.37 5.95 L 8.26 5.84 L 8.04 5.84 L 7.93 5.73 L 7.82 5.73 L 7.60 5.51 L 7.49 5.51 L 7.38 5.40 L 7.27 5.40 L 7.16 5.29 L 7.05 5.29 L 6.83 5.07 L 6.72 5.07 Z M 9.03 4.96 L 9.36 4.63 L 9.47 4.63 L 9.58 4.52 L 9.69 4.52 L 9.80 4.63 L 9.91 4.63 L 10.02 4.74 L 10.13 4.74 L 10.24 4.85 L 10.35 4.85 L 10.46 4.96 L 10.57 4.96 L 10.68 5.07 L 10.79 5.07 L 10.90 5.18 L 11.01 5.18 L 11.12 5.29 L 11.23 5.29 L 11.45 5.51 L 11.34 5.62 L 11.23 5.62 L 11.12 5.73 L 11.01 5.73 L 10.90 5.84 L 10.57 5.84 L 10.35 5.62 L 10.24 5.62 L 10.13 5.51 L 10.02 5.51 L 9.91 5.40 L 9.80 5.40 L 9.69 5.29 L 9.58 5.29 L 9.47 5.18 L 9.36 5.18 L 9.25 5.07 L 9.14 5.07 Z M 3.97 4.41 L 4.08 4.30 L 4.19 4.30 L 4.30 4.41 L 4.41 4.41 L 4.52 4.52 L 4.63 4.52 L 4.74 4.63 L 4.85 4.63 L 4.96 4.74 L 5.07 4.74 L 5.18 4.85 L 5.29 4.85 L 5.40 4.96 L 5.62 4.96 L 5.84 5.18 L 5.84 6.06 L 5.73 6.17 L 5.62 6.06 L 5.62 5.95 L 5.40 5.95 L 5.29 5.84 L 5.07 5.84 L 4.85 5.62 L 4.63 5.62 L 4.52 5.51 L 4.52 5.40 L 4.30 5.40 L 3.97 5.07 Z M 4.52 3.86 L 4.63 3.75 L 4.74 3.75 L 4.85 3.64 L 4.96 3.64 L 5.07 3.53 L 5.29 3.53 L 5.51 3.75 L 5.62 3.75 L 5.73 3.86 L 5.95 3.86 L 6.17 4.08 L 6.39 4.08 L 6.72 4.41 L 6.61 4.52 L 6.39 4.52 L 6.17 4.74 L 5.95 4.74 L 5.84 4.63 L 5.73 4.63 L 5.62 4.52 L 5.51 4.52 L 5.29 4.30 L 4.96 4.30 L 4.74 4.08 L 4.63 4.08 L 4.52 3.97 Z M 6.61 3.64 L 6.72 3.53 L 6.94 3.53 L 7.16 3.31 L 7.38 3.31 L 7.60 3.53 L 7.82 3.53 L 8.04 3.75 L 8.15 3.75 L 8.26 3.86 L 8.48 3.86 L 8.70 4.08 L 8.92 4.08 L 9.03 4.19 L 9.03 4.30 L 8.92 4.41 L 8.81 4.41 L 8.70 4.52 L 8.59 4.52 L 8.37 4.74 L 8.26 4.63 L 8.26 4.52 L 8.04 4.52 L 7.93 4.41 L 7.82 4.41 L 7.71 4.30 L 7.60 4.30 L 7.49 4.19 L 7.38 4.19 L 7.27 4.08 L 7.16 4.08 L 7.05 3.97 L 6.94 3.97 Z M 6.61 3.09 L 6.39 3.31 L 6.28 3.31 L 6.17 3.42 L 5.84 3.42 L 5.73 3.31 L 5.84 3.20 L 5.84 3.09 L 5.95 2.98 L 6.17 2.98 L 6.28 2.87 L 6.39 2.87 Z"/></symbol>
+  <symbol id="icon-hand" viewBox="0 0 24 24"><path d="M 7.71 3.75 L 7.05 6.72 L 8.37 13.76 L 4.74 11.12 L 3.42 11.12 L 2.76 12.88 L 9.25 21.35 L 9.47 19.81 L 3.31 12.55 L 4.52 11.67 L 7.38 14.53 L 8.81 14.20 L 7.60 4.74 L 8.92 4.74 L 10.68 11.01 L 12.00 2.98 L 13.21 3.42 L 13.54 11.01 L 14.64 10.68 L 16.29 4.30 L 17.61 4.74 L 16.40 12.33 L 19.70 7.93 L 20.58 8.37 L 15.63 19.92 L 16.18 21.35 L 21.13 8.04 L 19.48 7.38 L 16.95 11.12 L 18.16 4.41 L 15.96 3.75 L 13.87 10.24 L 13.76 3.09 L 11.67 2.54 L 10.79 9.91 L 9.47 4.41 Z M 16.51 11.12 L 16.62 11.01 L 16.84 11.01 L 16.95 11.12 L 16.95 11.34 L 16.84 11.45 L 16.62 11.45 L 16.51 11.34 Z"/></symbol>
+  <symbol id="icon-arm" viewBox="0 0 24 24"><path d="M 12.44 16.18 L 12.44 16.51 L 12.77 16.51 L 12.88 16.62 L 12.88 16.84 L 12.99 16.84 L 13.32 17.17 L 13.32 17.28 L 13.54 17.28 L 13.54 16.62 L 13.32 16.62 L 13.21 16.51 L 13.21 16.29 L 13.10 16.18 Z M 11.56 16.29 L 11.45 16.18 L 11.23 16.18 L 11.12 16.29 L 11.12 16.51 L 11.01 16.62 L 10.79 16.62 L 10.79 16.84 L 10.68 16.95 L 10.46 16.95 L 10.35 17.06 L 10.35 17.28 L 10.68 17.28 L 10.68 17.06 L 10.79 16.95 L 11.01 16.95 L 11.12 16.84 L 11.12 16.62 L 11.23 16.51 L 11.45 16.51 L 11.56 16.40 Z M 8.37 13.32 L 8.37 13.54 L 8.48 13.54 L 8.70 13.76 L 8.70 14.42 L 9.03 14.42 L 9.14 14.53 L 9.14 14.86 L 9.47 14.86 L 9.58 14.97 L 9.58 15.30 L 10.24 15.30 L 10.35 15.19 L 11.56 15.19 L 11.56 14.97 L 11.67 14.86 L 11.89 14.86 L 11.89 14.64 L 12.11 14.42 L 12.22 14.42 L 12.22 13.32 L 11.78 13.32 L 11.78 13.54 L 11.67 13.65 L 11.67 14.75 L 11.45 14.97 L 9.58 14.97 L 9.47 14.86 L 9.47 14.53 L 9.14 14.53 L 9.03 14.42 L 9.03 13.76 L 8.92 13.65 L 8.70 13.65 L 8.59 13.54 L 8.59 13.32 Z M 12.44 12.77 L 12.77 12.77 L 12.77 12.44 L 12.88 12.33 L 13.98 12.33 L 13.98 12.11 L 13.87 12.00 L 12.88 12.00 L 12.88 12.33 L 12.77 12.44 L 12.44 12.44 Z M 9.91 12.11 L 9.91 12.33 L 11.01 12.33 L 11.23 12.55 L 11.12 12.66 L 11.23 12.77 L 11.56 12.77 L 11.56 12.55 L 11.45 12.44 L 11.23 12.44 L 11.12 12.33 L 11.12 12.11 L 11.01 12.00 L 10.13 12.00 L 10.02 12.11 Z M 5.07 6.28 L 2.54 10.46 L 2.54 12.77 L 5.07 14.42 L 7.71 14.42 L 9.14 18.82 L 9.91 17.06 L 8.26 14.20 L 3.31 12.77 L 5.07 7.05 L 6.61 7.05 L 6.72 8.15 L 5.07 7.93 L 4.63 12.00 L 5.51 11.12 L 7.49 12.00 L 8.37 11.12 L 11.12 11.56 L 11.23 10.79 L 16.18 12.00 L 18.49 11.12 L 19.26 12.00 L 18.93 8.04 L 17.28 8.26 L 17.39 7.05 L 19.04 7.16 L 20.69 12.66 L 16.18 13.65 L 15.52 14.97 L 15.63 13.32 L 14.31 14.97 L 12.44 14.97 L 15.30 14.97 L 14.09 18.82 L 16.62 14.42 L 21.35 13.21 L 21.02 9.25 L 18.93 6.39 L 16.51 6.72 L 16.51 8.70 L 18.05 9.14 L 18.16 10.24 L 16.18 11.23 L 15.52 10.35 L 13.54 10.68 L 14.86 6.83 L 13.10 5.07 L 10.79 5.07 L 9.14 6.72 L 10.35 10.68 L 7.49 11.23 L 5.73 10.24 L 5.84 9.14 L 7.38 8.70 L 7.38 6.72 Z M 10.79 5.84 L 13.10 5.84 L 13.32 6.06 L 13.32 6.28 L 13.54 6.28 L 13.65 6.39 L 13.65 6.61 L 13.98 6.61 L 14.09 6.72 L 14.09 9.03 L 13.98 9.14 L 13.65 9.14 L 13.65 9.47 L 13.54 9.58 L 13.32 9.58 L 13.10 10.02 L 10.79 10.02 L 10.68 9.91 L 10.68 9.58 L 10.35 9.58 L 10.24 9.47 L 10.24 9.14 L 10.02 9.14 L 9.91 9.03 L 9.91 6.72 L 10.02 6.61 L 10.24 6.61 L 10.24 6.39 L 10.35 6.28 L 10.57 6.28 Z"/></symbol>
+  <symbol id="icon-stretch" viewBox="0 0 24 24"><path d="M 6.83 4.96 L 6.83 5.40 L 6.72 5.51 L 6.28 5.51 L 6.28 5.95 L 6.17 6.06 L 5.84 6.06 L 5.84 7.27 L 6.17 7.27 L 6.28 7.38 L 6.28 7.82 L 6.72 7.82 L 6.83 7.93 L 6.83 8.37 L 8.26 8.37 L 8.26 7.93 L 8.37 7.82 L 8.81 7.82 L 8.81 7.38 L 8.92 7.27 L 9.36 7.27 L 9.36 6.06 L 8.92 6.06 L 8.81 5.95 L 8.81 5.51 L 8.37 5.51 L 8.26 5.40 L 8.26 4.96 Z M 6.94 5.40 L 8.26 5.40 L 8.37 5.51 L 8.37 6.06 L 8.81 6.06 L 8.92 6.17 L 8.92 7.16 L 8.81 7.27 L 8.37 7.27 L 8.37 7.82 L 8.26 7.93 L 6.94 7.93 L 6.72 7.71 L 6.72 7.27 L 6.39 7.27 L 6.28 7.16 L 6.28 6.72 L 6.39 6.61 L 6.28 6.50 L 6.28 6.17 L 6.50 5.95 L 6.61 6.06 L 6.72 5.95 L 6.72 5.62 Z M 6.83 2.54 L 6.28 3.97 L 9.36 4.19 L 10.02 6.17 L 10.02 7.82 L 7.38 9.80 L 7.38 13.10 L 8.04 13.76 L 10.68 13.87 L 9.47 18.05 L 9.47 19.81 L 8.92 19.92 L 8.92 21.35 L 10.57 21.35 L 10.57 20.47 L 11.23 20.36 L 11.23 19.26 L 13.43 14.42 L 14.64 16.95 L 14.64 17.94 L 15.19 18.05 L 15.19 19.15 L 15.74 19.26 L 15.74 20.36 L 16.40 20.47 L 16.40 21.35 L 18.05 21.35 L 17.50 18.16 L 16.84 17.94 L 16.84 15.74 L 16.29 15.63 L 16.29 13.32 L 15.74 13.21 L 15.74 12.22 L 15.08 12.00 L 15.08 10.90 L 14.53 10.79 L 13.87 9.14 L 12.66 8.37 L 11.56 4.41 L 10.90 4.19 L 10.90 3.42 L 10.02 2.54 Z M 9.25 10.79 L 9.36 10.79 L 9.47 10.90 L 9.47 11.34 L 9.58 11.45 L 9.91 11.45 L 10.02 11.56 L 10.02 12.00 L 9.91 12.11 L 9.25 12.11 L 9.03 11.89 L 9.03 11.01 Z M 6.94 2.98 L 9.91 2.98 L 10.46 4.19 L 11.01 4.30 L 11.89 7.82 L 13.43 9.14 L 13.98 10.79 L 14.64 10.90 L 15.19 13.21 L 15.85 13.43 L 15.74 15.52 L 16.40 15.74 L 16.40 17.94 L 16.95 18.05 L 16.95 19.70 L 17.61 19.92 L 17.39 21.13 L 16.29 20.36 L 16.29 19.26 L 15.08 17.94 L 15.08 16.84 L 13.54 13.87 L 13.10 13.87 L 11.56 16.95 L 10.68 20.36 L 9.91 21.13 L 9.36 20.91 L 11.56 12.77 L 8.92 10.35 L 8.59 12.55 L 10.90 12.55 L 11.01 13.21 L 7.93 13.21 L 7.93 9.69 L 10.57 7.82 L 10.57 6.17 L 9.36 3.75 L 6.83 3.75 Z"/></symbol>
+</svg>
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-card-inner">
+    <div class="led-title-wrap"><span class="led-title" data-word="CATALYST"></span></div>
+    <div class="subtitle">Vincent's board</div>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Email" autocomplete="username" required>
+      <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+      <button type="submit">Log in</button>
+    </form>
+    <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
+</div>
+
+<header style="display:none;">
+  <div class="headbar">
+    <div class="led-title-wrap"><span class="led-title" data-word="CATALYST"></span></div>
+  </div>
+</header>
+
+<div class="wrap" style="display:none;">
+  <div id="demoBanner"></div>
+  <div class="view-tabs" id="viewTabs"></div>
+  <div id="overviewContent" style="display:none;"></div>
+  <div id="statsContent" style="display:none;"></div>
+  <div id="sessionArea">
+    <div class="tabs" id="tabs"></div>
+    <div id="content"></div>
+  </div>
+</div>
+<div id="celebrationOverlay"></div>
+
+<footer id="pageFooter" style="display:none;"><div class="logout-link" id="logoutBtn">Log out</div></footer>
+
+<script>
+/* ---------- LED DOT-MATRIX TITLE ---------- */
+const LED_BITMAPS = {
+  C: ['111','100','100','111'],
+  A: ['010','101','111','101'],
+  T: ['111','010','010','010'],
+  L: ['100','100','100','111'],
+  Y: ['101','101','010','010'],
+  S: ['111','100','011','111'],
+  U: ['101','101','101','111'],
+  R: ['111','101','110','101'],
+  O: ['111','101','101','111'],
+  K: ['101','110','110','101'],
+  '!': ['010','010','000','010'],
+  ' ': ['000','000','000','000']
+};
+const LED_COLORS = ['#FF5A2E','#49AEDB','#7FD858','#C9A94F','#B565F5'];
+
+function buildLEDLetter(letter){
+  const bmp = LED_BITMAPS[letter];
+  if(!bmp) return '';
+  let cells = '';
+  for(const row of bmp){
+    for(const bit of row){
+      cells += bit === '1'
+        ? `<div class="led-pixel on" style="background:${LED_COLORS[Math.floor(Math.random()*LED_COLORS.length)]}"></div>`
+        : `<div class="led-pixel"></div>`;
+    }
+  }
+  return `<span class="led-letter">${cells}</span>`;
+}
+function buildLvlBarLeds(count, litCount){
+  let bars = '';
+  for(let i=0; i<count; i++){
+    const lit = i < litCount;
+    bars += `<div class="lvl-bar-led ${lit?'lit':'dim'}" style="animation-delay:-${(Math.random()*3).toFixed(2)}s"></div>`;
+  }
+  return bars;
+}
+function miniPixelLetter(letter){
+  const bmp = LED_BITMAPS[letter];
+  if(!bmp) return '';
+  let cells = '';
+  for(const row of bmp){
+    for(const bit of row){
+      cells += bit === '1' ? '<div class="mini-pixel on"></div>' : '<div class="mini-pixel"></div>';
+    }
+  }
+  return `<div class="mini-pixel-letter">${cells}</div>`;
+}
+function renderLEDTitles(){
+  document.querySelectorAll('.led-title[data-word]').forEach(el=>{
+    el.innerHTML = el.dataset.word.split('').map(buildLEDLetter).join('');
+  });
+}
+function startLEDFlicker(){
+  document.querySelectorAll('.led-pixel.on').forEach(px=>{
+    (function loop(){
+      const delay = 350 + Math.random()*1200;
+      setTimeout(()=>{
+        px.style.background = LED_COLORS[Math.floor(Math.random()*LED_COLORS.length)];
+        loop();
+      }, delay);
+    })();
+  });
+}
+renderLEDTitles();
+startLEDFlicker();
+
+/* ---------- VIDEO LINKS ---------- */
+const VID = {
+  A1: "https://youtu.be/VkWt3qsmXJ4",
+  A2: "https://youtu.be/QT1CJtIk-Ls",
+  A3: "https://youtu.be/1sPH9_NiW8k",
+  B8: "https://youtu.be/fv71ejrYBXE",
+  B9: "https://youtu.be/cqIu1P85CH8",
+  C:  "https://youtu.be/GKN9_e4XEaM",
+  E1: "https://youtu.be/mAUg6h-lNDA",
+  E2: "https://youtu.be/0uAJpsjiJPA",
+  ROBOT_RULES: "https://www.youtube.com/watch?v=qisig3VzIcY",
+  J16: "https://youtu.be/Oy_gXJH0VHA",
+  J17: "https://youtu.be/FqHsgLd5ikc",
+  J18: "https://youtu.be/rN0-jZLynro",
+  J12: "https://youtu.be/4MQylF5S3lA",
+  FB_GUIDE: "https://youtu.be/o-h5aRi9Ie8",
+  STRETCH_UPPER: "https://youtu.be/9qcghR2O--g",
+  STRETCH_LOWER: "https://youtu.be/phpD_TDx474",
+  PROJECT_FORM: "https://docs.google.com/forms/d/e/1FAIpQLSc-xpqfzNlGXbkBHf-PIf9PX84VZ8Isuqi-4vk3TZLu5yp-dg/viewform?usp=header"
+};
+
+/* ---------- COACH NOTES PER WEEK ---------- */
+const COACH_NOTES = {
+  1: `I have given you a straightforward strength based plan. There is lots of scope to work on technique and mindset, etc, but we can address those in future plans.
+Your first session is projecting — choose limit boulders, ones you would normally be wary of trying, and set appropriate goals for each session. The second session is on-the-wall strength training: a bit of overhang fitness, then some boulder-specific strength work.
+Conditioning is as hard as you make it — sink deep into the positions and still finish all reps, resting as little as possible while still able to complete the set.
+Take some time before your first fingerboard session to calibrate the weight you need to add or remove to hit the right RPE. Follow the warm-up video carefully — Dave has done this warm-up every session for 5 years and swears by it.
+Try Hard, Have Fun and Fall Off More!`,
+  2: `Same structure as Week 1 — keep applying it. Projecting session first, on-the-wall strength second. You should have your fingerboard RPE calibrated by now, so use that same added weight/assistance unless it needs adjusting.
+Keep pushing the conditioning as hard as you can while still finishing every rep with good form.`,
+  3: `Same structure again. This is where consistency starts to matter more than intensity — keep the sessions, keep the notes on your projecting attempts, and keep an eye on how your fingerboard RPE is trending week to week.`,
+  4: `Please get in touch with enquiries@catalystclimbing.com to arrange your next training cycle!`,
+  5: `Deload week — no on-the-wall, conditioning or fingerboard work. Just three stretching sessions to help you recover before your next cycle.`
+};
+
+/* ---------- SHARED SESSION TEMPLATES (Weeks 1-4 identical) ---------- */
+function onWallSession1(){
+  return {
+    title: "Session 1 (Projecting)",
+    code: "C",
+    time: "~120 min",
+    drills: [
+      {code:"A1", name:"Dynamic Stretching Warm Up", time:"10 min", vid:VID.A1,
+        desc:"Work up through every joint from toes to head — 5 slow circles/clenches, then 5 fast ones, at each joint."},
+      {code:"A2", name:"Cardio Warm Up", time:"10 min", vid:VID.A2,
+        desc:"Raise your temperature with floor-based movement (Lizard / Frog / Bird / Chimpanzee) or any cardio you enjoy."},
+      {code:"A3", name:"Easy Climbing Warm Up", time:"10 min", vid:VID.A3,
+        desc:"Progress up through the grades on easy climbs to get warm before the session's main work."},
+      {code:"B8", name:"One Touch Only", time:"20 min", vid:VID.B8,
+        desc:"Get fully warmed up by progressing through the grades while focusing intently on precision of hand/foot placement. Move slowly and with control — once a hand/foot is placed, it doesn't move again."},
+      {code:"C", name:"Projecting — Hard Project Time!", time:"70 min", vid:VID.C, special:"projecting",
+        desc:"Walk the gym and pick 1–2 boulders that genuinely psych you — check the setting schedule so they'll be up for ~3 weeks. The goal is NOT to send yet."}
+    ]
+  };
+}
+function onWallSessionClass(){
+  return {
+    title: "Session 2 (Class)",
+    code: "",
+    time: "Coached class",
+    drills: []
+  };
+}
+function onWallSession3(){
+  return {
+    title: "Session 3 (Strength)",
+    code: "E",
+    time: "~120 min",
+    drills: [
+      {code:"A1", name:"Dynamic Stretching Warm Up", time:"10 min", vid:VID.A1,
+        desc:"Same warm-up routine as Session 1 — toes to head, slow then fast."},
+      {code:"A2", name:"Cardio Warm Up", time:"10 min", vid:VID.A2,
+        desc:"Raise your temperature with floor-based animal movements or any cardio you enjoy."},
+      {code:"A3", name:"Easy Climbing Warm Up", time:"10 min", vid:VID.A3,
+        desc:"Progress up through the grades on easy climbs."},
+      {code:"B9", name:"No Hesitation", time:"30 min", vid:VID.B9,
+        desc:"Practice commitment and moving with conviction. Failing this drill is not falling off — it's hesitating. If you feel unsure, go for it anyway; you'll learn you can do more than you thought."},
+      {code:"B?", name:"Overhanging Repeaters — Fitness Practice", time:"30 min",
+        desc:"Aim to send 10 boulders at V3–V4, all at least 20° overhanging. You'll likely repeat climbs — if you're really tired, use any holds you can. One climb every ~3 minutes; take plenty of rest between."},
+      {code:"E2", name:"Static Strength Training", time:"15 min", vid:VID.E2,
+        desc:"Hardcore Robot challenge — choose overhanging V1–V2 climbs. Move one limb at a time, everything else frozen, minimal technique (no drop-knees/heel-hooks). 3 attempts, plenty of rest, to get to the top under Robot rules.",
+        extraVid:{label:"Robot rules", href:VID.ROBOT_RULES}},
+      {code:"E1", name:"Core Strength Training", time:"15 min", vid:VID.E1,
+        desc:"Choose a steep, juggy climb and remove both feet from the wall after each hand move before placing them back. Start at the hardest level (no momentum, no bending legs) and drop down levels only as needed to finish."}
+    ]
+  };
+}
+function conditioning(){
+  return {
+    title: "TRX",
+    code: "J",
+    time: "30 min",
+    rounds: 4,
+    exercises: [
+      {code:"J16", name:"I's (TRX)", reps:10, vid:VID.J16},
+      {code:"J17", name:"Y's (TRX)", reps:10, vid:VID.J17},
+      {code:"J18", name:"T's (TRX)", reps:10, vid:VID.J18},
+      {code:"J12", name:"Suspension Push-ups — Wide", reps:10, vid:VID.J12}
+    ],
+    rest:"Rest 5 min between rounds",
+    note:"Go as hard as you can — sink deep into each position and still complete every rep, resting as little as possible between reps while still able to finish the set."
+  };
+}
+function fingerboardMaxHangs(){
+  return {
+    title: "Session 1 (Max Hangs)",
+    time: "~25 min",
+    guideVid: VID.FB_GUIDE,
+    sets: [
+      {n:1, grip:"4 finger Chisel grip, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:2, grip:"4 finger Chisel grip, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:3, grip:"4 finger Chisel grip, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:7, grip:"Front 3 finger open hand, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:8, grip:"Front 3 finger open hand, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:9, grip:"Front 3 finger open hand, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:13, grip:"30° slopers, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:14, grip:"30° slopers, 20mm", hang:"10 sec", rest:"3 min"},
+      {n:15, grip:"30° slopers, 20mm", hang:"10 sec", rest:"3 min", last:true}
+    ],
+    note:"Aim for ~80% intensity on every hang. Calibrate added weight/assistance in your first session to find that RPE."
+  };
+}
+function fingerboardRepeaters(){
+  return {
+    title: "Session 2 (Repeaters)",
+    time: "~20 min",
+    guideVid: VID.FB_GUIDE,
+    sets: [
+      {n:1, grip:"4 finger Half crimp, 20mm", hang:"7 sec on / 3 sec off × 10", rest:"4 min"},
+      {n:2, grip:"4 finger Half crimp, 20mm", hang:"7 sec on / 3 sec off × 10", rest:"4 min"},
+      {n:3, grip:"Front 3 finger Half crimp, 20mm", hang:"7 sec on / 3 sec off × 10", rest:"4 min"},
+      {n:4, grip:"Front 3 finger Half crimp, 20mm", hang:"7 sec on / 3 sec off × 10", rest:"4 min"},
+      {n:5, grip:"Back 3 Half crimp, 20mm", hang:"7 sec on / 3 sec off × 10", rest:"4 min"},
+      {n:6, grip:"Back 3 Half crimp, 20mm", hang:"7 sec on / 3 sec off × 10", rest:"", last:true}
+    ],
+    note:"Fingerboard before climbing, or on a non-climbing day — never on the same day as projecting hard, overhanging boulders."
+  };
+}
+const STRETCH_LIST = [
+  {name:"Shoulders 1", time:"1 min / side"},
+  {name:"Shoulders 2", time:"1 min / side"},
+  {name:"Chest", time:"1 min / side"},
+  {name:"Forearms 1", time:"2 min"},
+  {name:"Forearms 2", time:"2 min"},
+  {name:"Biceps", time:"2 min"},
+  {name:"Hamstring 1", time:"1 min / side"},
+  {name:"Hamstring 2", time:"1 min / side"},
+  {name:"Lizard", time:"1 min / side"},
+  {name:"Pigeon", time:"1 min / side"},
+  {name:"Frog", time:"2 min"},
+  {name:"Box Splits", time:"2 min"}
+];
+function stretchSession(n){
+  return {title:`Session ${n}`, time:"~20 min", list:STRETCH_LIST};
+}
+
+/* ---------- BUILD WEEKS ---------- */
+const WEEKS = {};
+[1,2,3,4].forEach(w=>{
+  WEEKS[w] = {
+    deload:false,
+    coachNote: COACH_NOTES[w] || null,
+    onWall1: onWallSession1(),
+    onWallClass: onWallSessionClass(),
+    onWall3: onWallSession3(),
+    conditioning: conditioning(),
+    fbMax: fingerboardMaxHangs(),
+    fbRep: fingerboardRepeaters(),
+    stretch1: stretchSession(1),
+    stretch2: stretchSession(2)
+  };
+});
+WEEKS[5] = {deload:true, coachNote: COACH_NOTES[5]};
+
+/* ---------- DAY PLAN (shared by calendar + celebration logic) ---------- */
+const DAY_PLAN = [
+  {label:'M', rest:false, cardKeys:['onwall1','stretch1']},
+  {label:'T', rest:false, cardKeys:['fbmax']},
+  {label:'W', rest:false, cardKeys:['onwallclass']},
+  {label:'T', rest:true,  cardKeys:[]},
+  {label:'F', rest:false, cardKeys:['fbrep']},
+  {label:'S', rest:false, cardKeys:['onwall3','stretch2']},
+  {label:'S', rest:false, cardKeys:['conditioning']}
+];
+
+const CELEBRATION_MESSAGES = [
+  "LEVEL CLEARED!",
+  "STAGE COMPLETE!",
+  "NICE COMBO!",
+  "HIGH SCORE!",
+  "PERFECT RUN!",
+  "1-UP!",
+  "CHECKPOINT SAVED!",
+  "FLAWLESS VICTORY!",
+  "GG WELL PLAYED!"
+];
+const BOSS_MESSAGES = [
+  "BOSS SESH DONE!",
+  "GREAT COACHING SESH!",
+  "COACH APPROVED!",
+  "LEVELED UP WITH THE BOSS!"
+];
+
+/* ---------- PROGRESS COUNTING (Overview tab) ---------- */
+const CYCLE_SESSION_KEYS = { wall: [], fingerboard: [], conditioning: [], stretching: [], coachedOnly: [] };
+[1,2,3,4].forEach(w=>{
+  const wk = `w${w}`;
+  CYCLE_SESSION_KEYS.wall.push(`done:${wk}:onwall1:session`, `done:${wk}:onwallclass:session`, `done:${wk}:onwall3:session`);
+  CYCLE_SESSION_KEYS.fingerboard.push(`done:${wk}:fbmax:session`, `done:${wk}:fbrep:session`);
+  CYCLE_SESSION_KEYS.conditioning.push(`done:${wk}:conditioning:session`);
+  CYCLE_SESSION_KEYS.stretching.push(`done:${wk}:stretch1:session`, `done:${wk}:stretch2:session`);
+  CYCLE_SESSION_KEYS.coachedOnly.push(`done:${wk}:coaching:session`);
+});
+CYCLE_SESSION_KEYS.stretching.push('done:w5:stretch1:session', 'done:w5:stretch2:session', 'done:w5:stretch3:session');
+
+const WEEK_SESSION_KEYS = {};
+[1,2,3,4].forEach(w=>{
+  const wk = `w${w}`;
+  WEEK_SESSION_KEYS[wk] = ['onwall1','onwallclass','onwall3','fbmax','fbrep','conditioning','stretch1','stretch2']
+    .map(s=>`done:${wk}:${s}:session`);
+});
+WEEK_SESSION_KEYS['w5'] = ['stretch1','stretch2','stretch3'].map(s=>`done:w5:${s}:session`);
+
+const SESSION_DURATION_MIN = {
+  onwall1:120, onwallclass:120, onwall3:120, coaching:120,
+  fbmax:25, fbrep:20,
+  conditioning:30,
+  stretch1:20, stretch2:20, stretch3:20
+};
+function suffixFromSessionKey(key){
+  return key.split(':')[2]; // "done:w1:onwall1:session" -> "onwall1"
+}
+async function countTrue(keys){
+  let n = 0;
+  for(const k of keys){ if(await getVal(k, false)) n++; }
+  return n;
+}
+async function anyTrue(keys){
+  for(const k of keys){ if(await getVal(k, false)) return true; }
+  return false;
+}
+async function allTrue(keys){
+  for(const k of keys){ if(!(await getVal(k, false))) return false; }
+  return true;
+}
+async function categoryHours(keys){
+  let min = 0;
+  for(const k of keys){
+    if(await getVal(k, false)) min += SESSION_DURATION_MIN[suffixFromSessionKey(k)] || 0;
+  }
+  return min/60;
+}
+async function computeCycleCounts(){
+  const wall = await countTrue(CYCLE_SESSION_KEYS.wall);
+  const fingerboard = await countTrue(CYCLE_SESSION_KEYS.fingerboard);
+  const conditioning = await countTrue(CYCLE_SESSION_KEYS.conditioning);
+  const stretching = await countTrue(CYCLE_SESSION_KEYS.stretching);
+  const coached = await countTrue(CYCLE_SESSION_KEYS.coachedOnly);
+  const wallHours = await categoryHours(CYCLE_SESSION_KEYS.wall);
+  const fingerboardHours = await categoryHours(CYCLE_SESSION_KEYS.fingerboard);
+  const conditioningHours = await categoryHours(CYCLE_SESSION_KEYS.conditioning);
+  const stretchingHours = await categoryHours(CYCLE_SESSION_KEYS.stretching);
+  const coachedHours = await categoryHours(CYCLE_SESSION_KEYS.coachedOnly);
+  return { wall, fingerboard, conditioning, stretching, coached,
+           wallHours, fingerboardHours, conditioningHours, stretchingHours, coachedHours,
+           maxWall:12, maxFingerboard:8, maxConditioning:4, maxStretching:11 };
+}
+async function computeAllTime(cycleCounts){
+  return {
+    wall: (await getArchivedTotal('wall')) + cycleCounts.wall,
+    fingerboard: (await getArchivedTotal('fingerboard')) + cycleCounts.fingerboard,
+    conditioning: (await getArchivedTotal('conditioning')) + cycleCounts.conditioning,
+    stretching: (await getArchivedTotal('stretching')) + cycleCounts.stretching,
+    coached: (await getArchivedTotal('coached')) + cycleCounts.coached,
+    wallHours: (await getArchivedTotal('wallHours')) + cycleCounts.wallHours,
+    fingerboardHours: (await getArchivedTotal('fingerboardHours')) + cycleCounts.fingerboardHours,
+    conditioningHours: (await getArchivedTotal('conditioningHours')) + cycleCounts.conditioningHours,
+    stretchingHours: (await getArchivedTotal('stretchingHours')) + cycleCounts.stretchingHours,
+    coachedHours: (await getArchivedTotal('coachedHours')) + cycleCounts.coachedHours
+  };
+}
+async function computeCalendarGrid(){
+  const grid = [];
+  for(let w=1; w<=5; w++){
+    const wk = `w${w}`;
+    if(w === 5){
+      grid.push(DAY_PLAN.map(() => ({state: 'rest'})));
+      continue;
+    }
+    const bossDone = await getVal(`done:${wk}:coaching:session`, false);
+    const bossDay = bossDone ? await getVal(`weekendday:${wk}:coaching`, null) : null;
+    const row = [];
+    for(let i=0; i<DAY_PLAN.length; i++){
+      const d = DAY_PLAN[i];
+      if(d.rest){ row.push({state:'rest'}); continue; }
+      let any = false;
+      for(const suffix of d.cardKeys){
+        if(await getVal(`done:${wk}:${suffix}:session`, false)){ any = true; break; }
+      }
+      const isSat = i === 5, isSun = i === 6;
+      if((isSat && bossDay === 'sat') || (isSun && bossDay === 'sun')){
+        row.push({state:'coached'});
+      } else {
+        row.push({state: any ? 'green' : 'blank'});
+      }
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+function findDayForCardKey(cardKey){
+  // cardKey like "w1:onwall1" -> find which DAY_PLAN entry contains that suffix
+  const [wk, suffix] = cardKey.split(':');
+  if(!wk || !suffix) return null;
+  const entry = DAY_PLAN.find(d => d.cardKeys.includes(suffix));
+  return entry ? {weekKey: wk, entry} : null;
+}
+async function isDayFullyDone(weekKey, entry){
+  if(!entry.cardKeys.length) return false;
+  for(const suffix of entry.cardKeys){
+    if(!(await getVal(`done:${weekKey}:${suffix}:session`, false))) return false;
+  }
+  return true;
+}
+
+/* ---------- STORAGE HELPERS ---------- */
+const STORAGE_PREFIX = 'catalyst_companion:';
+// Every plan cycle gets its own permanent namespace, so uploading next
+// month's plan can never overwrite or collide with this month's history.
+window.CYCLE_ID = 'cycle-2026-08';
+let storageBackend = 'memory'; // 'memory' until login resolves which mode applies
+const memoryStore = {};
+
+function cycleKey(key){ return `${window.CYCLE_ID}:${key}`; }
+
+async function getVal(key, fallback){
+  const fullKey = cycleKey(key);
+  if(storageBackend === 'memory'){
+    return Object.prototype.hasOwnProperty.call(memoryStore, fullKey) ? memoryStore[fullKey] : fallback;
+  }
+  try{
+    const v = localStorage.getItem(STORAGE_PREFIX + fullKey);
+    return v === null ? fallback : JSON.parse(v);
+  }catch(e){ return fallback; }
+}
+async function setVal(key, val){
+  const fullKey = cycleKey(key);
+  if(storageBackend === 'memory'){
+    memoryStore[fullKey] = val;
+    return;
+  }
+  try{ localStorage.setItem(STORAGE_PREFIX + fullKey, JSON.stringify(val)); }
+  catch(e){ console.error("storage set failed", e); }
+}
+// Permanent, cycle-independent totals from cycles that have already ended.
+// Starts at 0 — will be incremented by hand each time a new monthly plan
+// replaces this one, so All-Time keeps growing across every past cycle.
+async function getArchivedTotal(category){
+  return await getValRaw(`archived:${category}`, 0);
+}
+async function getValRaw(rawKey, fallback){
+  if(storageBackend === 'memory'){
+    return Object.prototype.hasOwnProperty.call(memoryStore, rawKey) ? memoryStore[rawKey] : fallback;
+  }
+  try{
+    const v = localStorage.getItem(STORAGE_PREFIX + rawKey);
+    return v === null ? fallback : JSON.parse(v);
+  }catch(e){ return fallback; }
+}
+async function setValRaw(rawKey, val){
+  if(storageBackend === 'memory'){
+    memoryStore[rawKey] = val;
+    return;
+  }
+  try{ localStorage.setItem(STORAGE_PREFIX + rawKey, JSON.stringify(val)); }
+  catch(e){ console.error("storage set failed", e); }
+}
+
+/* ---------- STATE ---------- */
+let currentWeek = 1;
+let currentView = 'sesh'; // 'sesh' or 'overview'
+const openCards = new Set();
+
+/* ---------- RENDER ---------- */
+const tabsEl = document.getElementById('tabs');
+const contentEl = document.getElementById('content');
+
+const UI_STATE_KEY = 'catalyst_ui_state';
+function saveUIState(){
+  try{ localStorage.setItem(UI_STATE_KEY, JSON.stringify({view: currentView, week: currentWeek})); }
+  catch(e){}
+}
+function loadUIState(){
+  try{
+    const raw = localStorage.getItem(UI_STATE_KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      if(s.view === 'overview' || s.view === 'sesh') currentView = s.view;
+      if(s.week >= 1 && s.week <= 5) currentWeek = s.week;
+    }
+  }catch(e){}
+}
+
+function renderTabs(){
+  tabsEl.innerHTML = '';
+  for(let w=1; w<=5; w++){
+    const t = document.createElement('div');
+    t.className = 'tab' + (w===5?' deload':'') + (w===currentWeek?' active':'');
+    t.textContent = w===5 ? 'WEEK 5 · DELOAD' : `WEEK ${w}`;
+    t.onclick = ()=>{ currentWeek = w; saveUIState(); renderTabs(); renderContent(); };
+    tabsEl.appendChild(t);
+    allTrue(WEEK_SESSION_KEYS[`w${w}`]).then(done=>{
+      if(done) t.classList.add('week-done');
+    });
+  }
+}
+
+const VIEW_ICONS = {
+  overview: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/></svg>',
+  sesh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12.5l2.5 2.5L16 9"/></svg>',
+  stats: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>'
+};
+function renderViewTabs(){
+  const el = document.getElementById('viewTabs');
+  if(!el) return;
+  const views = [['overview','Overview'],['sesh','Sesh'],['stats','Stats']];
+  el.innerHTML = views.map(([key,label])=>`
+    <div class="view-tab ${currentView===key?'active':''}" data-view="${key}">
+      <span class="view-tab-icon">${VIEW_ICONS[key]}</span>
+      <span class="view-tab-label">${label}</span>
+    </div>`).join('');
+  el.querySelectorAll('.view-tab').forEach(t=>{
+    t.onclick = ()=>{
+      currentView = t.dataset.view;
+      saveUIState();
+      renderViewTabs();
+      document.getElementById('overviewContent').style.display = currentView==='overview' ? '' : 'none';
+      document.getElementById('statsContent').style.display = currentView==='stats' ? '' : 'none';
+      document.getElementById('sessionArea').style.display = currentView==='sesh' ? '' : 'none';
+      if(currentView === 'overview') renderOverview();
+      if(currentView === 'stats') renderStats();
+      if(currentView === 'sesh') renderContent();
+    };
+  });
+}
+async function renderStats(){
+  const el = document.getElementById('statsContent');
+  const bodyWeight = await getValRaw('bodyWeight', '');
+  const defaultAdded = await getValRaw('defaultAddedWeight', '');
+  const history = await getValRaw('benchmarkHistory', []);
+  el.innerHTML = `
+    <div class="stat-box" style="margin-top:20px;">
+      <div class="stat-box-inner">
+      <div class="stat-box-title">Fingerboard Baseline</div>
+      <div class="fb-baseline-row">
+        <div>
+          <label class="fb-baseline-label">Body Weight (kg)</label>
+          <input type="text" id="statBodyWeight" class="fb-baseline-input" value="${bodyWeight}" placeholder="e.g. 68">
+        </div>
+        <div>
+          <label class="fb-baseline-label">Default Added (kg)</label>
+          <input type="text" id="statDefaultWeight" class="fb-baseline-input" value="${defaultAdded}" placeholder="e.g. 8">
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:14px;">
+        New to weighted hangs? Start at bodyweight only (0kg added) and adjust from feel. As a rough guide,
+        a 7-second hang on a 20mm edge (half-crimp) totalling under 100% of bodyweight suggests you may
+        need assistance; 100–120% is beginner/intermediate; 120–150% solid; 150–180% advanced; 180%+ elite.
+        This total includes your bodyweight, not just the added portion. Once set here, your default fills
+        in every fingerboard weight box below — still fully editable per set.
+      </div>
+      </div>
+    </div>
+    <div class="stat-box" style="margin-top:14px;">
+      <div class="stat-box-inner">
+      <div class="stat-box-title">Max Hang Benchmark</div>
+      <div class="note-box">Test every 4–8 weeks, not more often — this is a periodic check-in, not a
+        regular session. Standard: 20mm edge, half-crimp, 7 seconds — but log whatever you actually test.</div>
+      <div class="fb-baseline-row" style="margin-top:12px;">
+        <div><label class="fb-baseline-label">Edge (mm)</label><input type="text" id="benchEdge" class="fb-baseline-input" placeholder="20"></div>
+        <div><label class="fb-baseline-label">Grip</label><input type="text" id="benchGrip" class="fb-baseline-input" placeholder="Half crimp"></div>
+      </div>
+      <div class="fb-baseline-row" style="margin-top:10px;">
+        <div><label class="fb-baseline-label">Added (kg)</label><input type="text" id="benchWeight" class="fb-baseline-input" placeholder="e.g. 15"></div>
+        <div><label class="fb-baseline-label">Hang time (s)</label><input type="text" id="benchTime" class="fb-baseline-input" placeholder="7"></div>
+      </div>
+      <button type="button" class="journal-save" id="benchLogBtn" style="width:100%;margin-top:12px;">Log Test</button>
+      <div id="benchHistory" style="margin-top:16px;"></div>
+      </div>
+    </div>
+    <div class="stat-box" style="margin-top:14px;">
+      <div class="stat-box-inner" style="text-align:center;padding:30px 20px;">
+      <div style="font-family:var(--display);font-weight:800;font-size:19px;text-transform:uppercase;
+        letter-spacing:0.06em;color:var(--text-dim);">Coming soon</div>
+      <div style="font-size:13px;color:var(--text-dim);margin-top:10px;line-height:1.6;">
+        Added-weight progression charts and RPE trends over time.
+      </div>
+      </div>
+    </div>`;
+
+  const bwInput = document.getElementById('statBodyWeight');
+  const dwInput = document.getElementById('statDefaultWeight');
+  bwInput.onblur = () => setValRaw('bodyWeight', bwInput.value);
+  dwInput.onblur = () => setValRaw('defaultAddedWeight', dwInput.value);
+
+  document.getElementById('benchLogBtn').onclick = logBenchmarkTest;
+  renderBenchmarkHistory(history);
+}
+
+function renderBenchmarkHistory(history){
+  const el = document.getElementById('benchHistory');
+  if(!el) return;
+  if(!history.length){
+    el.innerHTML = `<div style="font-size:12.5px;color:var(--text-dim);text-align:center;">No tests logged yet.</div>`;
+    return;
+  }
+  el.innerHTML = history.map(h=>`
+    <div class="bench-entry">
+      <div class="bench-entry-date">${h.date}</div>
+      <div class="bench-entry-detail">${h.edge || '—'}mm · ${h.grip || '—'} · +${h.weight || 0}kg · ${h.time || '—'}s${h.pct ? ` · <span style="color:var(--accent)">${h.pct}% BW</span>` : ''}</div>
+    </div>`).join('');
+}
+
+async function logBenchmarkTest(){
+  const edge = document.getElementById('benchEdge').value;
+  const grip = document.getElementById('benchGrip').value;
+  const weight = parseFloat(document.getElementById('benchWeight').value) || 0;
+  const time = document.getElementById('benchTime').value;
+  const bw = parseFloat(await getValRaw('bodyWeight', ''));
+  let pct = null;
+  if(bw && !isNaN(bw) && bw > 0){
+    pct = Math.round(((bw + weight) / bw) * 100);
+  }
+  const history = await getValRaw('benchmarkHistory', []);
+  history.unshift({ date: new Date().toISOString().slice(0,10), edge, grip, weight, time, pct });
+  await setValRaw('benchmarkHistory', history);
+  document.getElementById('benchEdge').value = '';
+  document.getElementById('benchGrip').value = '';
+  document.getElementById('benchWeight').value = '';
+  document.getElementById('benchTime').value = '';
+  renderBenchmarkHistory(history);
+}
+
+function animateNumber(el, target, suffix){
+  suffix = suffix || '';
+  const duration = 750;
+  const start = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-t, 3);
+    el.textContent = Math.round(target*eased) + suffix;
+    if(t < 1) requestAnimationFrame(step);
+    else el.textContent = target + suffix;
+  }
+  requestAnimationFrame(step);
+}
+
+function ringSVG(value, max, colorVar, ringId){
+  const pct = max > 0 ? Math.min(1, value/max) : 0;
+  const N = 96;
+  const litCount = Math.round(pct * N);
+  const cx = 50, cy = 50, rOuter = 45, rInner = 36;
+  let ticks = '';
+  for(let i=0; i<N; i++){
+    const angle = (i * 360/N - 90) * Math.PI/180;
+    const x1 = (cx + rInner*Math.cos(angle)).toFixed(2);
+    const y1 = (cy + rInner*Math.sin(angle)).toFixed(2);
+    const x2 = (cx + rOuter*Math.cos(angle)).toFixed(2);
+    const y2 = (cy + rOuter*Math.sin(angle)).toFixed(2);
+    ticks += `<line class="ring-tick dim" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"
+      stroke="#3A3D42" stroke-width="2.3" stroke-linecap="round" style="animation-delay:${(i*0.025).toFixed(2)}s"/>`;
+  }
+  return `<svg viewBox="0 0 100 100" class="ring-svg" data-lit-count="${litCount}" data-color="${colorVar}" data-n="${N}">${ticks}</svg>`;
+}
+let idleChaseTimers = [];
+function stopIdleChases(){
+  idleChaseTimers.forEach(id => clearTimeout(id));
+  idleChaseTimers = [];
+}
+function runIdleGreyChase(svg, litCount, N){
+  const allTicks = Array.from(svg.querySelectorAll('.ring-tick'));
+  const bandWidth = 5;
+  let pos = 0;
+  function step(){
+    allTicks.forEach((el,i)=>{
+      if(el.classList.contains('lit')) return;
+      const dist = (i - pos + N) % N;
+      el.style.stroke = dist < bandWidth ? '#4A4D54' : '#26282C';
+    });
+    pos = (pos + 1) % N;
+    idleChaseTimers.push(setTimeout(step, 90));
+  }
+  step();
+}
+function runRingChase(svg){
+  const N = parseInt(svg.dataset.n, 10);
+  const litCount = parseInt(svg.dataset.litCount, 10);
+  const color = svg.dataset.color;
+  const ticks = Array.from(svg.querySelectorAll('.ring-tick'));
+  const chaseWidth = Math.max(8, Math.round(N/7));
+  const totalSteps = 70;
+  const laps = 7;
+  let step = 0;
+  // Remove dim/lit during the chase so the idle CSS flicker can't fight
+  // these per-frame JS colors — classes get cleanly reapplied at settle.
+  ticks.forEach(el => el.classList.remove('dim', 'lit'));
+  function easeOut(t){ return 1 - Math.pow(1-t, 3); }
+  function frame(){
+    if(step >= totalSteps){
+      ticks.forEach((el,i)=>{
+        const on = i < litCount;
+        el.classList.toggle('lit', on);
+        el.classList.toggle('dim', !on);
+        if(on){
+          el.setAttribute('stroke', color);
+          const frac = litCount > 0 ? i/litCount : 0;
+          el.setAttribute('stroke-opacity', frac < 0.34 ? 0.4 : (frac < 0.67 ? 0.7 : 1));
+        } else {
+          el.setAttribute('stroke', '#3A3D42');
+          el.removeAttribute('stroke-opacity');
+        }
+      });
+      runIdleGreyChase(svg, litCount, N);
+      return;
+    }
+    const eased = easeOut(step/totalSteps);
+    const pos = Math.floor(eased * laps * N) % N;
+    ticks.forEach((el,i)=>{
+      const on = ((i - pos + N) % N) < chaseWidth;
+      el.setAttribute('stroke', on ? color : '#3A3D42');
+    });
+    step++;
+    setTimeout(frame, 20);
+  }
+  frame();
+}
+function ringCard(value, max, colorVar, label, ringId){
+  return `
+  <div class="ring-card">
+    <div class="ring-wrap">
+      ${ringSVG(value, max, colorVar, ringId)}
+      <div class="ring-inner-frame"></div>
+      <div class="ring-value" style="color:${colorVar}" data-count="${value}" data-max="${max}">0/${max}</div>
+    </div>
+    <div class="ring-label">${label}</div>
+  </div>`;
+}
+
+async function renderOverview(){
+  stopIdleChases();
+  const el = document.getElementById('overviewContent');
+  const counts = await computeCycleCounts();
+  const allTime = await computeAllTime(counts);
+  const grid = await computeCalendarGrid();
+
+  const totalDone = counts.wall + counts.fingerboard + counts.conditioning + counts.stretching;
+  const totalMax = counts.maxWall + counts.maxFingerboard + counts.maxConditioning + counts.maxStretching;
+  const pct = totalMax > 0 ? Math.round((totalDone/totalMax)*100) : 0;
+  const planLevel = await getValRaw('planLevel', 1);
+
+  let html = `
+    <div class="lvl-block">
+      <div class="vincent-label">VINCENT</div>
+      <div class="lvl-bar-track">
+        <div class="lvl-bar-track-inner">
+        <div class="lvl-bar-leds">${buildLvlBarLeds(60, Math.round(pct/100*60))}</div>
+        <div class="lvl-bar-label">LVL ${planLevel} · <span id="heroPct">0%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-inner">
+      <div class="ring-grid">
+        ${ringCard(counts.wall, counts.maxWall, 'var(--accent)', 'Wall Sessions', 'ring-wall')}
+        ${ringCard(counts.fingerboard, counts.maxFingerboard, 'var(--blue)', 'Fingerboard', 'ring-fb')}
+        ${ringCard(counts.conditioning, counts.maxConditioning, 'var(--green)', 'Conditioning', 'ring-cond')}
+        ${ringCard(counts.stretching, counts.maxStretching, 'var(--gold)', 'Stretching', 'ring-stretch')}
+      </div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-inner">
+      <div class="alltime-row alltime-row-5">
+        <div class="alltime-stat"><span class="alltime-num" style="color:var(--accent)" data-count="${allTime.wall}">0</span><span class="alltime-hours" style="color:var(--accent)">${allTime.wallHours.toFixed(1)}h</span><span class="alltime-lbl">Wall</span></div>
+        <div class="alltime-stat"><span class="alltime-num" style="color:var(--coached)" data-count="${allTime.coached}">0</span><span class="alltime-hours" style="color:var(--coached)">${allTime.coachedHours.toFixed(1)}h</span><span class="alltime-lbl">Boss</span></div>
+        <div class="alltime-stat"><span class="alltime-num" style="color:var(--blue)" data-count="${allTime.fingerboard}">0</span><span class="alltime-hours" style="color:var(--blue)">${allTime.fingerboardHours.toFixed(1)}h</span><span class="alltime-lbl">Fingers</span></div>
+        <div class="alltime-stat"><span class="alltime-num" style="color:var(--green)" data-count="${allTime.conditioning}">0</span><span class="alltime-hours" style="color:var(--green)">${allTime.conditioningHours.toFixed(1)}h</span><span class="alltime-lbl">Condi</span></div>
+        <div class="alltime-stat"><span class="alltime-num" style="color:var(--gold)" data-count="${allTime.stretching}">0</span><span class="alltime-hours" style="color:var(--gold)">${allTime.stretchingHours.toFixed(1)}h</span><span class="alltime-lbl">Stretch</span></div>
+      </div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-box-inner">
+      <div class="cal-row">
+        <div></div>
+        ${DAY_PLAN.map(d=>`<div class="cal-daylabel">${d.label}</div>`).join('')}
+      </div>
+      ${grid.map((row,i)=>`
+      <div class="cal-row">
+        <div class="cal-weeknum">${i+1}</div>
+        ${row.map(cell=> cell.state==='rest'
+          ? `<div class="cal-box rest">${miniPixelLetter('R')}</div>`
+          : `<div class="cal-box ${cell.state}"></div>`).join('')}
+      </div>`).join('')}
+      </div>
+    </div>`;
+
+  el.innerHTML = html;
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      el.querySelectorAll('.ring-svg').forEach(svg => runRingChase(svg));
+      el.querySelectorAll('.ring-value[data-count]').forEach(v=>{
+        animateNumber(v, parseInt(v.dataset.count,10), '/'+v.dataset.max);
+      });
+      el.querySelectorAll('.alltime-num[data-count]').forEach(v=>{
+        animateNumber(v, parseInt(v.dataset.count,10), '');
+      });
+      animateNumber(document.getElementById('heroPct'), pct, '%');
+    });
+  });
+}
+
+function spawnConfetti(){
+  const colors = ['#FF5A2E','#FFD23F','#7FD858','#49AEDB','#B565F5'];
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  for(let i=0; i<180; i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random()*100) + 'vw';
+    piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDelay = (Math.random()*0.4) + 's';
+    piece.style.animationDuration = (1.7 + Math.random()*1.3) + 's';
+    piece.style.setProperty('--rot', (Math.random()*720 - 360) + 'deg');
+    container.appendChild(piece);
+  }
+  document.body.appendChild(container);
+  setTimeout(()=> container.remove(), 3400);
+}
+function showCelebration(isBoss){
+  const el = document.getElementById('celebrationOverlay');
+  const pool = isBoss ? BOSS_MESSAGES : CELEBRATION_MESSAGES;
+  const msg = pool[Math.floor(Math.random()*pool.length)];
+  el.textContent = msg;
+  el.classList.add('show');
+  spawnConfetti();
+  setTimeout(()=> el.classList.remove('show'), 2200);
+}
+
+let vidSeq = 0;
+function toEmbedUrl(url){
+  let id = '';
+  if(url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split('?')[0];
+  else if(url.includes('watch?v=')) id = url.split('watch?v=')[1].split('&')[0];
+  return {embed: `https://www.youtube.com/embed/${id}`, watch: `https://www.youtube.com/watch?v=${id}`};
+}
+function vidButton(url, label){
+  label = label || '▶ Watch demo';
+  const id = 'vidembed' + (vidSeq++);
+  const {embed, watch} = toEmbedUrl(url);
+  return `<button type="button" class="vid-btn" data-embed="${embed}" data-watch="${watch}" data-target="${id}" data-label="${label}">${label}</button><div class="vid-embed" id="${id}"></div>`;
+}
+
+function drillHTML(sessionKey, d, idx){
+  const ckKey = `done:${sessionKey}:${idx}`;
+  const vidBtn = d.vid ? vidButton(d.vid, '▶ Watch demo') : '';
+  const extraVidBtn = d.extraVid ? vidButton(d.extraVid.href, `▶ ${d.extraVid.label}`) : '';
+  return `
+  <div class="drill">
+    <div class="drill-row">
+      <input type="checkbox" data-key="${ckKey}">
+      <div style="flex:1">
+        <span class="drill-name">${d.code ? `<span class="code-tag" style="margin-right:6px;">${d.code}</span>` : ''}${d.name}</span>
+        <span class="drill-time">${d.time}</span>
+        <div class="drill-desc">${d.desc}</div>
+        <div class="drill-actions">${vidBtn}${extraVidBtn}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function dayHeader(label){
+  return `<div class="day-header"><span class="day-dot"></span>${label}</div>`;
+}
+function restDayHTML(label){
+  return `
+  <div class="day-header"><span class="day-dot" style="background:var(--text-dim);"></span>${label}</div>
+  <div class="rest-day">Rest day — no training scheduled. Recover!</div>`;
+}
+
+function coachNoteCardHTML(weekKey, weekNum, note){
+  const key = `${weekKey}:coachnote`;
+  const open = openCards.has(key);
+  return `
+  <div class="card coachnote-card ${open?'open':''}" data-card="${key}">
+    <div class="card-inner">
+      <div class="card-head">
+        <div class="card-head-row">
+          <span class="chevron">▶</span>
+          <span class="card-title" style="text-transform:none;font-size:14.5px;">Coach's note — Week ${weekNum}</span>
+        </div>
+      </div>
+      <div class="card-body">${note}</div>
+    </div>
+  </div>`;
+}
+
+function cardShell(key, title, code, timeLabel, bodyHTML, needsDayGate, iconKey){
+  const open = openCards.has(key);
+  const doneKey = `done:${key}:session`;
+  const dayToggleHTML = needsDayGate ? `
+    <div class="coach-day-toggle">
+      <button type="button" class="coach-day-btn" data-day="sat">Sat</button>
+      <button type="button" class="coach-day-btn" data-day="sun">Sun</button>
+    </div>` : '';
+  const iconHTML = iconKey ? `<svg class="card-icon"><use href="#icon-${iconKey}"/></svg>` : '';
+  return `
+  <div class="card ${open?'open':''}" data-card="${key}">
+    <div class="card-inner">
+      <div class="card-head">
+        <div class="card-head-row">
+          <input type="checkbox" class="session-check" data-key="${doneKey}" title="Mark whole session done" ${needsDayGate?'disabled':''}>
+          <span class="chevron">▶</span>
+          ${iconHTML}
+          ${code?`<span class="code-tag">${code}</span>`:''}
+          <span class="card-title">${title}</span>
+          <span class="card-time">${timeLabel}</span>
+        </div>
+        ${dayToggleHTML}
+      </div>
+      <div class="card-body">${bodyHTML}</div>
+    </div>
+  </div>`;
+}
+
+function onWallCardHTML(sessionKey, session, needsDayGate){
+  let body;
+  if(!session.drills || session.drills.length === 0){
+    body = `<div class="note-box">This is your coached class session — no set drills listed here yet. Just tick the box above once it's done.</div>`;
+  } else {
+    body = session.drills.map((d,i)=>{
+      if(d.special==='projecting'){
+        return drillHTML(sessionKey, d, i) + projectingExtrasHTML(sessionKey);
+      }
+      return drillHTML(sessionKey, d, i);
+    }).join('');
+  }
+  return cardShell(sessionKey, session.title, session.code, session.time, body, needsDayGate, 'wall');
+}
+
+function projectingExtrasHTML(sessionKey){
+  return `
+  <div style="margin:6px 0 0 27px;">
+    <div class="note-box">Before each attempt, check: do you have a plan? Is the climb clean? Are you rested enough to give full effort?</div>
+    <ol class="goal-ladder">
+      <li>Find and hold all the body positions</li>
+      <li>Try all the moves</li>
+      <li>Send all moves</li>
+      <li>Link 2–3 moves together (can run alongside Goal 3)</li>
+      <li>Link the boulder in two halves</li>
+      <li>Send</li>
+    </ol>
+    <div class="journal">
+      <div style="font-family:var(--display);font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.05em;">Between-attempt reflection</div>
+      <label>1. What happened?</label>
+      <textarea data-note="${sessionKey}:q1" placeholder="e.g. my foot slipped"></textarea>
+      <label>2. Why did it happen?</label>
+      <textarea data-note="${sessionKey}:q2" placeholder="e.g. not enough weight on the hold"></textarea>
+      <label>3. What were you thinking about?</label>
+      <textarea data-note="${sessionKey}:q3" placeholder="e.g. how bad the foothold looked"></textarea>
+      <label>4. What will you focus on next attempt?</label>
+      <textarea data-note="${sessionKey}:q4" placeholder="e.g. commit more weight into that foothold"></textarea>
+      <button class="journal-save" data-save="${sessionKey}">Save notes</button>
+      <span class="journal-status" data-status="${sessionKey}">Saved ✓</span>
+      <div style="margin-top:10px;"><a class="form-link" href="${VID.PROJECT_FORM}" target="_blank" rel="noopener">Or log it in Dave's Google Form ↗</a></div>
+    </div>
+  </div>`;
+}
+
+function coachingCardHTML(weekKey){
+  const body = `<div class="note-box">Boss sesh happens on a flexible weekend day — pick Sat or Sun in the header above once it's done.</div>`;
+  return cardShell(`${weekKey}:coaching`, "Boss Sesh", "", "~120 min", body, true);
+}
+
+function conditioningCardHTML(weekKey, c){
+  let rounds = '';
+  for(let r=1; r<=c.rounds; r++){
+    let exRows = c.exercises.map(ex=>{
+      const ckKey = `${weekKey}:cond:r${r}:${ex.code}`;
+      return `
+      <div class="drill">
+        <div class="drill-row">
+          <input type="checkbox" data-key="done:${ckKey}">
+          <div style="flex:1">
+            <span class="drill-name"><span class="code-tag" style="margin-right:6px;">${ex.code}</span>${ex.name}</span>
+            <span class="drill-time">${ex.reps} reps</span>
+            <div class="drill-actions">
+              ${vidButton(ex.vid, '▶ Watch demo')}
+              <input type="text" data-rpe="${ckKey}" placeholder="RPE /10" style="width:64px;background:var(--panel-alt);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 8px;font-size:16px;font-family:var(--mono);">
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    rounds += `
+      <div style="margin-bottom:10px;">
+        <div style="font-family:var(--display);font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-dim);padding:8px 0 2px;">Round ${r} of ${c.rounds}</div>
+        ${exRows}
+        ${r < c.rounds ? `<div class="note-box" style="margin:8px 0;">${c.rest}</div>` : ''}
+      </div>`;
+  }
+  const body = `<div class="note-box">${c.note}</div>${rounds}`;
+  return cardShell(`${weekKey}:conditioning`, c.title, c.code, c.time, body, false, 'arm');
+}
+
+async function updateBWDisplay(skey, weightValue){
+  const span = document.querySelector(`.fb-bw-pct[data-bw-for="${skey}"]`);
+  if(!span) return;
+  const bw = parseFloat(await getValRaw('bodyWeight', ''));
+  if(!bw || isNaN(bw) || bw <= 0){ span.textContent = ''; return; }
+  const added = parseFloat(weightValue);
+  const addedNum = isNaN(added) ? 0 : added;
+  span.textContent = Math.round(((bw + addedNum) / bw) * 100) + '%';
+}
+
+function fingerboardCardHTML(weekKey, key, fb){
+  let rows = fb.sets.map(s=>{
+    const skey = `${weekKey}:${key}:set${s.n}`;
+    let out = `<tr>
+      <td><input type="checkbox" data-key="done:${skey}"></td>
+      <td class="mono">${s.n}</td>
+      <td>${s.grip}</td>
+      <td class="mono">${s.hang}</td>
+      <td><input type="text" data-weight="${skey}" placeholder="+/- kg"></td>
+      <td><span class="fb-bw-pct" data-bw-for="${skey}"></span></td>
+    </tr>`;
+    if(s.rest && !s.last){
+      out += `<tr class="rest"><td colspan="6">Rest ${s.rest}</td></tr>`;
+    }
+    return out;
+  }).join('');
+  const body = `
+    <div class="drill-actions" style="margin-bottom:6px;">
+      ${vidButton(fb.guideVid, '▶ Watch guidance video first')}
+    </div>
+    <div class="note-box">${fb.note}</div>
+    <table class="set-table">
+      <tr><th>Done</th><th>Set</th><th>Edge / Grip</th><th>Hang</th><th>Added wt / assist</th><th>% BW</th></tr>
+      ${rows}
+    </table>`;
+  return cardShell(`${weekKey}:${key}`, fb.title, "", fb.time, body, false, 'hand');
+}
+
+function stretchCardHTML(weekKey, key, s, vid, needsDayGate){
+  const rows = s.list.map((st,i)=>{
+    const ckKey = `${weekKey}:${key}:${i}`;
+    return `<div class="drill" style="padding:9px 0;">
+      <div class="drill-row">
+        <input type="checkbox" data-key="done:${ckKey}">
+        <div style="flex:1;display:flex;justify-content:space-between;">
+          <span class="drill-name" style="font-size:13.5px;">${st.name}</span>
+          <span class="drill-time">${st.time}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const body = `
+    <div class="drill-actions" style="margin-bottom:4px;">
+      ${vidButton(VID.STRETCH_UPPER, '▶ Upper body demo')}
+      ${vidButton(VID.STRETCH_LOWER, '▶ Lower body demo')}
+    </div>
+    ${rows}`;
+  return cardShell(`${weekKey}:${key}`, s.title, "", s.time, body, needsDayGate, 'stretch');
+}
+
+function renderContent(){
+  const wk = WEEKS[currentWeek];
+  const weekKey = `w${currentWeek}`;
+
+  if(wk.deload){
+    contentEl.innerHTML = `
+      ${wk.coachNote ? coachNoteCardHTML(weekKey, currentWeek, wk.coachNote) : ''}
+      <div class="deload-msg">
+        <div class="big">Deload Week</div>
+        <p>No on-the-wall, conditioning or fingerboard work this week. Just three stretching sessions to recover — then get in touch with Dave (enquiries@catalystclimbing.com) to arrange your next cycle.</p>
+      </div>
+      <div style="margin-top:14px;">
+        ${stretchCardHTML(weekKey, 'stretch1', stretchSession(1), VID.STRETCH_UPPER)}
+        ${stretchCardHTML(weekKey, 'stretch2', stretchSession(2), VID.STRETCH_LOWER)}
+        ${stretchCardHTML(weekKey, 'stretch3', stretchSession(3), VID.STRETCH_LOWER)}
+      </div>`;
+    attachHandlers();
+    hydrateState();
+    return;
+  }
+
+  let html = '';
+  if(wk.coachNote){
+    html += coachNoteCardHTML(weekKey, currentWeek, wk.coachNote);
+  }
+
+  html += dayHeader('Monday');
+  html += onWallCardHTML(`${weekKey}:onwall1`, wk.onWall1);
+  html += stretchCardHTML(weekKey, 'stretch1', wk.stretch1, VID.STRETCH_UPPER);
+
+  html += dayHeader('Tuesday');
+  html += fingerboardCardHTML(weekKey, 'fbmax', wk.fbMax);
+
+  html += dayHeader('Wednesday');
+  html += onWallCardHTML(`${weekKey}:onwallclass`, wk.onWallClass);
+
+  html += restDayHTML('Thursday');
+
+  html += dayHeader('Friday');
+  html += fingerboardCardHTML(weekKey, 'fbrep', wk.fbRep);
+
+  html += dayHeader('Saturday / Sunday');
+  html += onWallCardHTML(`${weekKey}:onwall3`, wk.onWall3);
+  html += stretchCardHTML(weekKey, 'stretch2', wk.stretch2, VID.STRETCH_LOWER);
+
+  html += dayHeader('Saturday / Sunday');
+  html += conditioningCardHTML(weekKey, wk.conditioning);
+
+  html += dayHeader('Saturday / Sunday');
+  html += coachingCardHTML(weekKey);
+
+  contentEl.innerHTML = html;
+  attachHandlers();
+  hydrateState();
+}
+
+/* ---------- INTERACTIVITY ---------- */
+function attachHandlers(){
+  document.querySelectorAll('.card-head').forEach(h=>{
+    h.onclick = ()=>{
+      const card = h.closest('.card');
+      const key = card.dataset.card;
+      const isOpen = openCards.has(key);
+      if(isOpen){
+        openCards.delete(key);
+        card.classList.remove('open');
+      } else {
+        document.querySelectorAll('.card.open').forEach(c=>{
+          if(c !== card){ openCards.delete(c.dataset.card); c.classList.remove('open'); }
+        });
+        openCards.add(key);
+        card.classList.add('open');
+      }
+    };
+  });
+
+  document.querySelectorAll('.vid-btn[data-embed]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const target = document.getElementById(btn.dataset.target);
+      const wasOpen = target.classList.contains('open');
+
+      // close every other open video first (accordion behaviour)
+      document.querySelectorAll('.vid-btn[data-embed]').forEach(otherBtn=>{
+        if(otherBtn === btn) return;
+        const otherTarget = document.getElementById(otherBtn.dataset.target);
+        if(otherTarget && otherTarget.classList.contains('open')){
+          otherTarget.classList.remove('open');
+          otherTarget.innerHTML = '';
+          const otherFallback = otherTarget.nextElementSibling && otherTarget.nextElementSibling.classList.contains('vid-fallback')
+            ? otherTarget.nextElementSibling : null;
+          if(otherFallback) otherFallback.remove();
+          otherBtn.textContent = otherBtn.dataset.label;
+        }
+      });
+
+      const existingFallback = target.nextElementSibling && target.nextElementSibling.classList.contains('vid-fallback')
+        ? target.nextElementSibling : null;
+      if(wasOpen){
+        target.classList.remove('open');
+        target.innerHTML = '';
+        if(existingFallback) existingFallback.remove();
+        btn.textContent = btn.dataset.label;
+      } else {
+        target.classList.add('open');
+        target.innerHTML = `<iframe src="${btn.dataset.embed}?autoplay=1&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        btn.textContent = btn.dataset.label.replace('▶', '▼').replace(/Watch/i, 'Hide');
+        const fallback = document.createElement('div');
+        fallback.className = 'vid-fallback';
+        fallback.innerHTML = `Video blocked here? <a href="${btn.dataset.watch}" target="_blank" rel="noopener">Open on YouTube instead ↗</a>`;
+        target.after(fallback);
+      }
+    };
+  });
+
+  document.querySelectorAll('input[type=checkbox][data-key]').forEach(cb=>{
+    cb.onchange = ()=>{
+      setVal(cb.dataset.key, cb.checked);
+      const drillRow = cb.closest('.drill');
+      if(drillRow) drillRow.classList.toggle('ticked', cb.checked);
+      const trRow = cb.closest('tr');
+      if(trRow) trRow.classList.toggle('ticked', cb.checked);
+    };
+  });
+
+  document.querySelectorAll('.session-check').forEach(cb=>{
+    cb.addEventListener('click', e => e.stopPropagation());
+    cb.addEventListener('change', async () => {
+      const card = cb.closest('.card');
+      if(!card) return;
+      const isCoaching = card.dataset.card && card.dataset.card.split(':')[1] === 'coaching';
+      if(isCoaching){
+        card.classList.toggle('coaching-done', cb.checked);
+        if(cb.checked) showCelebration(true);
+      } else {
+        card.classList.toggle('session-done', cb.checked);
+        if(cb.checked){
+          const dayInfo = findDayForCardKey(card.dataset.card);
+          if(dayInfo && await isDayFullyDone(dayInfo.weekKey, dayInfo.entry)){
+            showCelebration();
+          }
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll('.coach-day-btn').forEach(btn=>{
+    btn.onclick = async (e)=>{
+      e.stopPropagation();
+      const card = btn.closest('.card');
+      const cardKey = card.dataset.card;
+      const wasSelected = btn.classList.contains('selected');
+      const cb = card.querySelector('.session-check');
+      if(wasSelected){
+        // clicking the already-selected day deselects it
+        await setVal(`weekendday:${cardKey}`, null);
+        card.querySelectorAll('.coach-day-btn').forEach(b=> b.classList.remove('selected'));
+        if(cb){
+          cb.checked = false;
+          cb.disabled = true;
+          card.classList.remove('coaching-done');
+          await setVal(`done:${cardKey}:session`, false);
+        }
+      } else {
+        await setVal(`weekendday:${cardKey}`, btn.dataset.day);
+        card.querySelectorAll('.coach-day-btn').forEach(b=> b.classList.toggle('selected', b === btn));
+        if(cb) cb.disabled = false;
+      }
+    };
+  });
+
+  document.querySelectorAll('input[data-weight]').forEach(inp=>{
+    inp.onblur = ()=> setVal(`fbweight:${inp.dataset.weight}`, inp.value);
+    inp.oninput = ()=> updateBWDisplay(inp.dataset.weight, inp.value);
+  });
+  document.querySelectorAll('input[data-rpe]').forEach(inp=>{
+    inp.onblur = ()=> setVal(`condrpe:${inp.dataset.rpe}`, inp.value);
+  });
+
+  document.querySelectorAll('textarea[data-note]').forEach(ta=>{
+    ta.onblur = ()=> setVal(`note:${ta.dataset.note}`, ta.value);
+  });
+
+  document.querySelectorAll('button[data-save]').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const sk = btn.dataset.save;
+      const status = document.querySelector(`[data-status="${sk}"]`);
+      status.style.opacity = 1;
+      setTimeout(()=>{ status.style.opacity = 0; }, 1800);
+    };
+  });
+}
+
+async function hydrateState(){
+  const checks = document.querySelectorAll('input[type=checkbox][data-key]');
+  for(const cb of checks){
+    const v = await getVal(cb.dataset.key, false);
+    cb.checked = !!v;
+    const drillRow = cb.closest('.drill');
+    if(drillRow) drillRow.classList.toggle('ticked', cb.checked);
+    const trRow = cb.closest('tr');
+    if(trRow) trRow.classList.toggle('ticked', cb.checked);
+  }
+
+  for(const card of document.querySelectorAll('.card')){
+    const toggle = card.querySelector('.coach-day-toggle');
+    if(toggle){
+      const cardKey = card.dataset.card;
+      const day = await getVal(`weekendday:${cardKey}`, null);
+      card.querySelectorAll('.coach-day-btn').forEach(b=>{
+        b.classList.toggle('selected', b.dataset.day === day);
+      });
+      const cb = card.querySelector('.session-check');
+      if(cb) cb.disabled = !day;
+    }
+  }
+  const defaultAdded = await getValRaw('defaultAddedWeight', '');
+  const weights = document.querySelectorAll('input[data-weight]');
+  for(const inp of weights){
+    const v = await getVal(`fbweight:${inp.dataset.weight}`, '');
+    inp.value = (v !== '' && v !== null && v !== undefined) ? v : (defaultAdded || '');
+    updateBWDisplay(inp.dataset.weight, inp.value);
+  }
+  const rpes = document.querySelectorAll('input[data-rpe]');
+  for(const inp of rpes){
+    const v = await getVal(`condrpe:${inp.dataset.rpe}`, '');
+    inp.value = v || '';
+  }
+  const notes = document.querySelectorAll('textarea[data-note]');
+  for(const ta of notes){
+    const v = await getVal(`note:${ta.dataset.note}`, '');
+    ta.value = v || '';
+  }
+
+  document.querySelectorAll('.session-check').forEach(cb=>{
+    const card = cb.closest('.card');
+    if(!card) return;
+    const isCoaching = card.dataset.card && card.dataset.card.split(':')[1] === 'coaching';
+    card.classList.toggle(isCoaching ? 'coaching-done' : 'session-done', cb.checked);
+  });
+}
+
+// The app no longer starts itself on page load — login gates everything.
+// The auth module (below) calls this once it knows who's logged in.
+window.startApp = function(mode){
+  storageBackend = mode === 'real' ? 'local' : 'memory';
+  if(mode === 'demo'){
+    const demoBanner = document.getElementById('demoBanner');
+    if(demoBanner){
+      demoBanner.innerHTML = `<div class="demo-banner">🧪 Demo mode — click around freely, nothing here is saved.</div>`;
+    }
+  }
+  loadUIState();
+  renderViewTabs();
+  renderTabs();
+  renderContent();
+  document.getElementById('overviewContent').style.display = currentView==='overview' ? '' : 'none';
+  document.getElementById('sessionArea').style.display = currentView==='sesh' ? '' : 'none';
+  if(currentView === 'overview') renderOverview();
+};
+
+// Pull-to-refresh — Home Screen apps on iOS often lose this gesture entirely
+// since they run without browser chrome, so we add it back manually.
+(function setupPullToRefresh(){
+  let startY = null, pulling = false;
+  document.addEventListener('touchstart', e=>{
+    if(window.scrollY === 0){ startY = e.touches[0].clientY; pulling = true; }
+    else{ pulling = false; }
+  }, {passive:true});
+  document.addEventListener('touchmove', e=>{
+    if(!pulling || startY === null) return;
+    if(e.touches[0].clientY - startY > 90){ pulling = false; location.reload(); }
+  }, {passive:true});
+  document.addEventListener('touchend', ()=>{ pulling = false; startY = null; }, {passive:true});
+})();
+</script>
+
+<script type="module">
+  const loginScreen = document.getElementById('loginScreen');
+  const headerEl = document.querySelector('header');
+  const appWrap = document.querySelector('.wrap');
+  const footerEl = document.getElementById('pageFooter');
+  const loginError = document.getElementById('loginError');
+
+  function showLogin(msg){
+    loginScreen.style.display = 'flex';
+    headerEl.style.display = 'none';
+    appWrap.style.display = 'none';
+    footerEl.style.display = 'none';
+    loginError.textContent = msg || '';
+  }
+  function showApp(){
+    loginScreen.style.display = 'none';
+    headerEl.style.display = '';
+    appWrap.style.display = '';
+    footerEl.style.display = '';
+  }
+
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js");
+    const { getFirestore, doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js");
+    const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } =
+      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js");
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqRlaNZhPMhQoQHxoO2b6wAa-DYuOcGvQ",
+      authDomain: "catalysttraining.firebaseapp.com",
+      projectId: "catalysttraining",
+      storageBucket: "catalysttraining.firebasestorage.app",
+      messagingSenderId: "1036567541586",
+      appId: "1:1036567541586:web:7f4d3ab61f0b27216d6c8b"
+    };
+    const MY_UID = "G3SenM8rFvTA7Fh32zszFw9bIOY2";
+    const PREFIX = 'catalyst_companion:';
+
+    const fbApp = initializeApp(firebaseConfig);
+    const db = getFirestore(fbApp);
+    const auth = getAuth(fbApp);
+    const progressDocRef = doc(db, "companion", "vincent");
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      loginError.textContent = '';
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (err) {
+        loginError.textContent = 'Login failed — check your email and password.';
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        showLogin();
+        return;
+      }
+      showApp();
+      const isReal = user.uid === MY_UID;
+
+      if (isReal) {
+        // Pull whatever's saved in the cloud into local storage first
+        try {
+          const snap = await getDoc(progressDocRef);
+          if (snap.exists()) {
+            const remote = snap.data() || {};
+            Object.keys(remote).forEach(k => {
+              try {
+                const localKey = k.startsWith('raw:') ? k.slice(4) : k;
+                localStorage.setItem(PREFIX + localKey, JSON.stringify(remote[k]));
+              } catch (e) {}
+            });
+          }
+        } catch (e) {
+          console.warn('Cloud load failed, starting from local cache.', e);
+        }
+
+        window.startApp('real');
+
+        // Upgrade setVal so every future save also pushes to the cloud
+        const originalSetVal = window.setVal;
+        window.setVal = async function (key, val) {
+          await originalSetVal(key, val);
+          try {
+            const fullKey = `${window.CYCLE_ID}:${key}`;
+            await setDoc(progressDocRef, { [fullKey]: val }, { merge: true });
+          } catch (e) {
+            console.warn('Cloud sync write failed, saved locally only.', e);
+          }
+        };
+        const originalSetValRaw = window.setValRaw;
+        window.setValRaw = async function (rawKey, val) {
+          await originalSetValRaw(rawKey, val);
+          try {
+            await setDoc(progressDocRef, { [`raw:${rawKey}`]: val }, { merge: true });
+          } catch (e) {
+            console.warn('Cloud sync write failed, saved locally only.', e);
+          }
+        };
+        console.log('Logged in as Vincent — cloud sync active.');
+      } else {
+        // Any other account: fully interactive demo, nothing persists anywhere
+        window.startApp('demo');
+        console.log('Logged in as demo — nothing will be saved.');
+      }
+    });
+  } catch (e) {
+    console.error('Firebase failed to load — login unavailable.', e);
+    loginError.textContent = 'Connection error — please check your internet and reload.';
+  }
+</script>
+</body>
+</html>
