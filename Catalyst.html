@@ -133,7 +133,26 @@
   .view-tab.active{background:#fff;color:#14161A;}
 
   /* progress rings */
-  .ring-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px;margin:0;}
+  .ring-lightning-wrap{position:relative;overflow:hidden;}
+  .ring-lightning{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+  .ring-grid{position:relative;z-index:1;}
+
+  @keyframes lbolt1{
+    0%,100%{opacity:0}
+    1.5%{opacity:1}  2.5%{opacity:0.12}  3.5%{opacity:0.75}  4.8%{opacity:0}
+  }
+  @keyframes lbolt2{
+    0%,100%{opacity:0}
+    1.2%{opacity:0.9} 2.1%{opacity:0.08} 3.1%{opacity:0.65}  4.2%{opacity:0}
+  }
+  @keyframes lbolt3{
+    0%,100%{opacity:0}
+    1.8%{opacity:0.8} 2.6%{opacity:0.15} 3.6%{opacity:0.55}  4.5%{opacity:0}
+  }
+  .lbolt1{animation:lbolt1 6.7s linear infinite;animation-delay:0s;}
+  .lbolt2{animation:lbolt2 8.1s linear infinite;animation-delay:-2.9s;}
+  .lbolt3{animation:lbolt3 7.4s linear infinite;animation-delay:-5.1s;}
+  .ring-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px;margin:0;}
   .ring-grid > .ring-card:nth-child(5){grid-column:1 / -1;justify-self:center;max-width:50%;}
   .ring-card{display:flex;flex-direction:column;align-items:center;padding:1px 1px;}
   .ring-wrap{position:relative;width:100%;max-width:200px;aspect-ratio:1;margin:0 auto;}
@@ -193,7 +212,7 @@
   .mini-pixel-letter{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);
     gap:1px;width:55%;height:70%;margin:15% auto 0;}
   .mini-pixel{background:transparent;}
-  .mini-pixel.on{background:#FFFFFF;border-radius:0.5px;}
+  .mini-pixel.on{background:#888888;border-radius:0.5px;}
 
   /* celebration overlay */
   #celebrationOverlay{position:fixed;top:28%;left:50%;width:90%;max-width:360px;
@@ -221,7 +240,7 @@
   }
 
   /* full green fill once ticked */
-  .drill.ticked{border:2px solid var(--green);border-radius:8px;margin:0 -8px 0 -8px;padding-left:8px;
+  .drill.ticked{border:2px solid var(--green);border-radius:8px;margin:0 -8px 4px -8px;padding-left:8px;
     padding-right:8px;}
   tr.ticked td{box-shadow:inset 0 2px 0 var(--green), inset 0 -2px 0 var(--green);}
   tr.ticked td:first-child{box-shadow:inset 0 2px 0 var(--green), inset 0 -2px 0 var(--green), inset 2px 0 0 var(--green);}
@@ -326,7 +345,7 @@
   .card-time{font-family:var(--mono);font-size:12.5px;color:var(--text-dim);white-space:nowrap;flex-shrink:0;}
   .chevron{font-size:13px;color:var(--text-dim);transition:transform .15s ease;}
   .card.open .chevron{transform:rotate(90deg);}
-  .card-body{display:none;padding:2px 16px 18px;border-top:1px solid var(--border);}
+  .card-body{display:none;padding:2px 16px 30px;border-top:1px solid var(--border);}
   .card.open .card-body{display:block;}
   .progress-pill{font-family:var(--mono);font-size:11px;color:var(--text-dim);}
   .progress-pill.done{color:var(--green);}
@@ -397,6 +416,22 @@
     clip-path:var(--pixel-clip-sm);color:var(--text);padding:9px 10px;font-size:16px;
     font-family:var(--mono);box-sizing:border-box;}
   .fb-bw-pct{font-family:var(--mono);font-size:13px;color:var(--text-dim);white-space:nowrap;}
+  .fb-grip-card{background:var(--border);clip-path:var(--pixel-clip-sm);padding:1px;margin-bottom:10px;}
+  .fb-grip-card:last-child{margin-bottom:0;}
+  .fb-grip-card-inner{background:#000;clip-path:var(--pixel-clip-sm);padding:10px 14px 12px;}
+  .fb-grip-head{display:flex;align-items:flex-start;gap:10px;}
+  .fb-grip-ex{font-family:var(--display);font-size:13px;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--accent);white-space:nowrap;}
+  .fb-grip-info{flex:1;min-width:0;}
+  .fb-grip-name{font-family:var(--display);font-weight:700;font-size:15px;text-transform:uppercase;
+    letter-spacing:0.04em;color:var(--text);line-height:1.3;}
+  .fb-grip-meta{font-family:var(--mono);font-size:13px;color:var(--text-dim);margin-top:4px;}
+
+  .wt-ctrl{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .wt-btn{font-family:var(--display);font-size:20px;line-height:1;padding:2px 10px 4px;
+    background:var(--panel-alt);border:2px solid var(--border);clip-path:var(--pixel-clip-sm);
+    color:var(--text);cursor:pointer;}
+  .wt-display{font-family:var(--mono);font-size:12px;min-width:38px;text-align:center;color:var(--text);}
   .bench-entry{padding:8px 0;border-bottom:1px solid var(--border);}
   .bench-entry:last-child{border-bottom:none;}
   .bench-entry-date{font-family:var(--mono);font-size:11px;color:var(--text-dim);}
@@ -459,19 +494,20 @@
 
   /* header — exit button only */
   .fbt-header{display:flex;align-items:center;justify-content:flex-end;
-    padding:12px 16px 10px;background:rgba(0,0,0,0.6);border-bottom:1px solid var(--border);
+    padding:12px 16px 10px;background:rgba(0,0,0,0.6);
     flex-shrink:0;}
-  .fbt-exit-btn{background:rgba(255,255,255,0.06);border:2px solid var(--border);
-    clip-path:var(--pixel-clip-lg);font-family:var(--display);font-size:26px;
-    cursor:pointer;padding:12px 24px;color:var(--text-dim);line-height:1;letter-spacing:0.08em;}
+  .fbt-exit-btn{background:none;border:none;cursor:pointer;padding:0;line-height:0;color:#FFFFFF;}
+  .fbt-exit-btn:hover{opacity:0.8;}
+  .fbt-exit-frame{background:rgba(255,255,255,0.28);clip-path:var(--pixel-clip-lg);padding:2px;display:inline-flex;}
+  .fbt-exit-cell{background:#000;clip-path:var(--pixel-clip-lg);padding:14px 16px;display:flex;align-items:center;justify-content:center;}
 
   /* body */
-  .fbt-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    padding:14px 18px 10px;overflow:hidden;gap:0;}
+  .fbt-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding:14px 18px 6px;overflow:hidden;gap:0;}
 
   /* big countdown */
-  .fbt-big-num{font-family:var(--display);font-size:180px;line-height:0.86;
-    letter-spacing:-4px;position:relative;text-align:center;margin:2px 0;}
+  .fbt-big-num{font-family:var(--display);font-size:210px;line-height:0.86;
+    letter-spacing:-4px;position:relative;text-align:center;margin:6vh 0 2px;}
   .fbt-num-lg{font-size:130px;}
   .fbt-num-sm{font-size:88px;}
   .fbt-big-num::after{content:'';position:absolute;inset:0;
@@ -491,36 +527,27 @@
   .fbt-green-text {color:var(--green);}
 
   /* state labels */
-  .fbt-state-label{font-family:var(--display);font-size:22px;letter-spacing:0.28em;
-    text-transform:uppercase;margin-bottom:4px;}
-  .fbt-state-tag{font-family:var(--display);font-size:20px;letter-spacing:0.2em;
-    text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-  .fbt-blink-dot{width:8px;height:8px;flex-shrink:0;animation:blink-square 0.7s step-start infinite;}
-  .fbt-orange-bg{background:var(--accent);}
-  .fbt-blue-bg  {background:var(--blue);}
-  .fbt-green-bg {background:var(--green);}
+  .fbt-state-label{font-family:var(--display);font-size:46px;letter-spacing:0.22em;
+    text-transform:uppercase;margin-bottom:0;}
 
   /* position info block — 3-line centred box */
+  .fbt-pos-frame{background:var(--border);clip-path:var(--pixel-clip-lg);padding:2px;
+    margin:auto 14px;width:calc(100% - 28px);max-width:380px;align-self:center;}
   .fbt-pos-block{display:flex;flex-direction:column;align-items:center;
-    background:#000;border:2px solid var(--border);
-    clip-path:var(--pixel-clip-lg);padding:12px 18px 14px;
-    margin:10px 14px 8px;width:calc(100% - 28px);max-width:340px;align-self:center;}
-  .fbt-pos-name{font-family:var(--display);font-size:24px;letter-spacing:0.06em;
-    text-transform:uppercase;text-align:center;line-height:1.2;}
-  .fbt-pos-seq{font-family:var(--display);font-size:18px;letter-spacing:0.06em;
-    color:var(--blue);margin-top:5px;text-align:center;}
-  .fbt-pos-info{font-family:var(--display);font-size:16px;letter-spacing:0.08em;
-    color:var(--text-dim);margin-top:5px;text-align:center;}
+    background:#000;clip-path:var(--pixel-clip-lg);padding:20px 20px 24px;}
+  .fbt-pos-name{font-family:var(--display);font-size:36px;letter-spacing:0.06em;
+    text-transform:uppercase;text-align:center;line-height:1.15;}
+  .fbt-pos-seq{font-family:var(--display);font-size:30px;letter-spacing:0.06em;
+    color:var(--blue);margin-top:4px;text-align:center;}
+  .fbt-pos-info{font-family:var(--display);font-size:30px;letter-spacing:0.08em;
+    color:var(--text-dim);margin-top:6px;text-align:center;}
 
   /* repeater rep counter */
-  .fbt-rep-row{display:flex;align-items:baseline;gap:8px;margin-top:6px;}
-  .fbt-rep-num{font-family:var(--display);font-size:44px;line-height:1;color:var(--gold);}
-  .fbt-rep-total{font-family:var(--display);font-size:26px;color:var(--text-dim);}
-  .fbt-rep-label{font-family:var(--display);font-size:16px;letter-spacing:0.16em;
-    text-transform:uppercase;color:var(--text-dim);}
+  .fbt-rep-counter{font-family:var(--display);font-size:36px;letter-spacing:0.1em;
+    text-align:center;margin:4px 0 2px;line-height:1;}
 
   /* LED progress bar (matches level bar style) */
-  .fbt-led-bar{display:flex;gap:2px;height:16px;width:100%;max-width:320px;margin:10px 0 12px;}
+  .fbt-led-bar{display:flex;gap:3px;height:22px;width:100%;max-width:360px;margin:12px 0 14px;}
   .fbt-led{flex:1;height:100%;}
   @keyframes fbtLedDim{
     0%{background:#1e1e22;} 25%{background:#27272c;} 50%{background:#18181b;}
@@ -549,30 +576,30 @@
   .fbt-rpe-active-green{color:var(--green)!important;border-color:var(--green)!important;background:rgba(92,229,52,0.10)!important;}
 
   /* next exercise block */
-  .fbt-next-block{background:rgba(255,255,255,0.04);border:1.5px solid rgba(92,229,52,0.22);
-    clip-path:var(--pixel-clip-sm);padding:10px 18px 12px;width:100%;max-width:340px;
-    margin-top:14px;text-align:center;}
-  .fbt-next-label{font-family:var(--display);font-size:14px;letter-spacing:0.24em;
-    color:var(--green);text-transform:uppercase;margin-bottom:3px;}
+  .fbt-next-block{display:none;} /* next exercise now shown in pos-block area */
+  .fbt-next-label{display:none;}
   .fbt-next-name{font-family:var(--display);font-size:22px;letter-spacing:0.06em;text-transform:uppercase;}
   .fbt-next-info{font-family:var(--display);font-size:16px;color:var(--blue);margin-top:2px;}
   .fbt-next-seq{font-family:var(--display);font-size:16px;color:var(--text-dim);margin-top:2px;letter-spacing:0.06em;}
-  .fbt-next-last{color:var(--green);font-family:var(--display);font-size:18px;letter-spacing:0.1em;}
-  /* repeater rep count display */
-  .fbt-rep-count{font-family:var(--display);font-size:42px;letter-spacing:0.08em;
-    color:var(--gold);text-align:center;margin:4px 0 6px;line-height:1;}
+  .fbt-next-last{color:var(--blue);font-family:var(--display);font-size:24px;letter-spacing:0.1em;text-align:center;}
+  /* repeater rep count display — see .fbt-rep-counter */
 
   /* controls */
-  .fbt-controls{display:flex;align-items:center;gap:6px;padding:12px 14px 14px;
+  .fbt-controls{display:flex;align-items:center;gap:6px;padding:12px 14px 16px;
     background:rgba(0,0,0,0.5);border-top:1px solid var(--border);flex-shrink:0;}
-  .fbt-ctrl{flex:1;padding:22px 0;background:rgba(255,255,255,0.06);border:2px solid var(--border);
+  .fbt-ctrl-frame{flex:1;background:var(--border);clip-path:var(--pixel-clip-lg);padding:2px;display:flex;}
+  .fbt-ctrl-frame.is-center{flex:2;}
+  .fbt-ctrl-frame.is-orange{background:var(--accent);}
+  .fbt-ctrl-frame.is-blue  {background:var(--blue);}
+  .fbt-ctrl-frame.is-gold  {background:var(--gold);}
+  .fbt-ctrl{flex:1;padding:20px 0;background:#000;border:none;width:100%;
     clip-path:var(--pixel-clip-lg);display:flex;align-items:center;justify-content:center;
-    font-family:var(--display);font-size:22px;letter-spacing:0.1em;
-    text-transform:uppercase;color:var(--text-dim);cursor:pointer;}
-  .fbt-ctrl-orange{flex:2;background:var(--accent);border-color:var(--accent);color:#1a0d06;clip-path:var(--pixel-clip-lg);}
-  .fbt-ctrl-blue  {flex:2;background:var(--blue);  border-color:var(--blue);  color:#010D1A;clip-path:var(--pixel-clip-lg);}
-  .fbt-ctrl-green {flex:2;background:var(--green); border-color:var(--green); color:#060F03;clip-path:var(--pixel-clip-lg);}
-  .fbt-ctrl-gold  {flex:2;background:var(--gold);  border-color:var(--gold);  color:#1A1400;clip-path:var(--pixel-clip-lg);}
+    font-family:var(--display);font-size:38px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--text-dim);cursor:pointer;line-height:1;}
+  .fbt-ctrl svg{display:block;}
+  .fbt-ctrl.is-orange{background:var(--accent);color:#1a0d06;}
+  .fbt-ctrl.is-blue  {background:var(--blue);  color:#010D1A;}
+  .fbt-ctrl.is-gold  {background:var(--gold);  color:#1A1400;}
 
   /* session done */
   .fbt-done-header{display:flex;flex-direction:column;align-items:center;
@@ -618,24 +645,30 @@
     text-transform:uppercase;color:var(--text-dim);cursor:pointer;}
 
   /* ── Landscape ── */
-  @media (orientation:landscape) and (max-height:500px){
-    .fbt-header{padding:8px 14px 7px;}
-    .fbt-big-num{font-size:100px;letter-spacing:-3px;}
-    .fbt-num-lg{font-size:80px;}
-    .fbt-num-sm{font-size:65px;}
-    .fbt-controls{padding:8px 14px 10px;}
-    .fbt-ctrl{padding:14px 0;font-size:18px;}
+  @media (orientation:landscape) and (max-height:560px){
+    .fbt-screen:not(.fbt-done){
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      grid-template-columns:3fr 2fr;
+    }
+    .fbt-header{grid-column:1/-1;grid-row:1;padding:7px 14px 6px;}
+    .fbt-body{grid-column:1;grid-row:2;padding:6px 16px 4px;justify-content:center;align-self:center;}
+    .fbt-pos-frame{grid-column:2;grid-row:2;margin:0 14px 0 0;
+      max-width:none;width:auto;align-self:center;justify-self:stretch;}
+    .fbt-controls{grid-column:1/-1;grid-row:3;padding:6px 14px 8px;}
+    .fbt-big-num{font-size:90px;letter-spacing:-3px;}
+    .fbt-num-lg{font-size:72px;}
+    .fbt-num-sm{font-size:58px;}
+    .fbt-ctrl{padding:10px 0;font-size:26px;}
+    .fbt-state-label{font-size:30px;}
+    .fbt-pos-name{font-size:24px;}
+    .fbt-pos-seq{font-size:18px;}
+    .fbt-pos-info{font-size:18px;}
+    .fbt-led-bar{max-width:100%;}
     .fbt-done-stamp{font-size:56px;}
     .fbt-done-stats{gap:12px;margin-top:6px;}
     .fbt-stat-val{font-size:26px;}
-    .fbt-body{padding:8px 16px 6px;}
-    .fbt-pos-block{padding:6px 16px 8px;margin:5px 14px 4px;}
-    .fbt-pos-name{font-size:18px;}
-    .fbt-rep-num{font-size:32px;}
     .fbt-done-header{padding:10px 16px 7px;}
-    .fbt-hang .fbt-body,
-    .fbt-rest .fbt-body,
-    .fbt-exrest .fbt-body{flex-direction:row;gap:24px;align-items:center;justify-content:center;}
   }
 </style>
 </head>
@@ -1270,11 +1303,19 @@ function renderViewTabs(){
 }
 async function renderStats(){
   const el = document.getElementById('statsContent');
+  const playerName = await getValRaw('playerName', '');
   const bodyWeight = await getValRaw('bodyWeight', '');
   const defaultAdded = await getValRaw('defaultAddedWeight', '');
   const history = await getValRaw('benchmarkHistory', []);
   el.innerHTML = `
     <div class="stat-box" style="margin-top:20px;">
+      <div class="stat-box-inner">
+      <div class="stat-box-title">Player's name</div>
+      <input type="text" id="statPlayerName" class="fb-baseline-input"
+        value="${playerName}" placeholder="Unidentified" style="margin-top:8px;">
+      </div>
+    </div>
+    <div class="stat-box" style="margin-top:14px;">
       <div class="stat-box-inner">
       <div class="stat-box-title">Fingerboard Baseline</div>
       <div class="fb-baseline-row">
@@ -1323,6 +1364,11 @@ async function renderStats(){
       </div>
     </div>`;
 
+  const nameInput = document.getElementById('statPlayerName');
+  nameInput.onblur = async () => {
+    await setValRaw('playerName', nameInput.value);
+    if(currentView === 'overview') renderOverview();
+  };
   const bwInput = document.getElementById('statBodyWeight');
   const dwInput = document.getElementById('statDefaultWeight');
   bwInput.onblur = () => setValRaw('bodyWeight', bwInput.value);
@@ -1534,6 +1580,143 @@ function ringCard(value, max, colorVar, iconKey, ringId){
   </div>`;
 }
 
+/* ── Procedural ring lightning ── */
+let _lightningGen = 0;
+function initRingLightning(){
+  const canvas = document.querySelector('.ring-lightning-canvas');
+  if(!canvas) return;
+  const gen = ++_lightningGen;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const rings = [
+    {x:W*0.25,y:H*0.27,r:W*0.185},
+    {x:W*0.75,y:H*0.27,r:W*0.185},
+    {x:W*0.25,y:H*0.77,r:W*0.185},
+    {x:W*0.75,y:H*0.77,r:W*0.185},
+  ];
+
+  function displace(x1,y1,x2,y2,depth,rough){
+    if(depth===0) return [{x:x1,y:y1},{x:x2,y:y2}];
+    const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);
+    if(len<1) return [{x:x1,y:y1},{x:x2,y:y2}];
+    const mx=(x1+x2)/2,my=(y1+y2)/2;
+    const off=(Math.random()-0.5)*len*rough;
+    const px=mx+(-dy/len)*off,py=my+(dx/len)*off;
+    return [...displace(x1,y1,px,py,depth-1,rough),...displace(px,py,x2,y2,depth-1,rough)];
+  }
+
+  function hitT(x1,y1,x2,y2,ring){
+    const dx=x2-x1,dy=y2-y1,fx=x1-ring.x,fy=y1-ring.y;
+    const a=dx*dx+dy*dy; if(a<0.001) return -1;
+    const b=2*(fx*dx+fy*dy),c=fx*fx+fy*fy-ring.r*ring.r;
+    const disc=b*b-4*a*c; if(disc<0) return -1;
+    const t=(-b-Math.sqrt(disc))/(2*a);
+    return (t>0.02&&t<0.97)?t:-1;
+  }
+
+  function insideAny(x,y){ return rings.some(r=>Math.hypot(x-r.x,y-r.y)<r.r*0.92); }
+
+  function buildRoute(ex,ey){
+    const pts=[{x:ex,y:ey}];
+    let cx=ex,cy=ey,vx=(Math.random()-0.5)*75,vy=50+Math.random()*65;
+    for(let step=0;step<12;step++){
+      const tx=cx+vx+(Math.random()-0.5)*18,ty=cy+vy+(Math.random()-0.5)*14;
+      let bestT=2,bestRing=null;
+      for(const ring of rings){const t=hitT(cx,cy,tx,ty,ring);if(t>0&&t<bestT){bestT=t;bestRing=ring;}}
+      if(bestRing){
+        const hx=cx+bestT*(tx-cx),hy=cy+bestT*(ty-cy);
+        const nx=(hx-bestRing.x)/bestRing.r,ny=(hy-bestRing.y)/bestRing.r;
+        const startAngle=Math.atan2(hy-bestRing.y,hx-bestRing.x);
+        const tangentSign=((-ny)*vx+(nx)*vy)>0?1:-1;
+        const sweep=tangentSign*(0.38+Math.random()*0.52);
+        for(let s=0;s<=4;s++){
+          const a=startAngle+sweep*(s/4);
+          pts.push({x:bestRing.x+bestRing.r*Math.cos(a),y:bestRing.y+bestRing.r*Math.sin(a)});
+        }
+        const exitAngle=startAngle+sweep;
+        const enx=Math.cos(exitAngle),eny=Math.sin(exitAngle);
+        const dot=vx*enx+vy*eny;
+        vx=(vx-2*dot*enx)*0.85+(Math.random()-0.5)*22;
+        vy=(vy-2*dot*eny)*0.85+(Math.random()-0.5)*18;
+        cx=bestRing.x+bestRing.r*enx+enx*3;
+        cy=bestRing.y+bestRing.r*eny+eny*3;
+      } else {
+        if(!insideAny(tx,ty)){pts.push({x:tx,y:ty});cx=tx;cy=ty;}
+        vx=vx*0.78+(Math.random()-0.5)*32;
+        vy=vy*0.78+(Math.random()-0.5)*24;
+      }
+      if(cx<-30||cx>W+30||cy<-30||cy>H+30) break;
+    }
+    return pts;
+  }
+
+  function drawPts(pts,lw,col,alpha,blur){
+    if(pts.length<2) return;
+    ctx.save();
+    ctx.globalAlpha=alpha;ctx.strokeStyle=col;ctx.lineWidth=lw;
+    ctx.lineJoin='round';ctx.lineCap='round';
+    ctx.shadowColor=col;ctx.shadowBlur=blur;
+    ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+    for(let i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
+    ctx.stroke();ctx.restore();
+  }
+
+  function drawBolt(route){
+    const all=[];
+    for(let i=0;i<route.length-1;i++){
+      const seg=displace(route[i].x,route[i].y,route[i+1].x,route[i+1].y,6,0.5);
+      if(i>0) seg.shift();
+      all.push(...seg);
+    }
+    drawPts(all,18,'#0055cc',0.06,35);
+    drawPts(all,8,'#0088ff',0.15,18);
+    drawPts(all,3,'#44ccff',0.50,9);
+    drawPts(all,1,'#aaf0ff',0.90,3);
+    if(all.length>8&&Math.random()<0.65){
+      const idx=Math.floor(all.length*(0.2+Math.random()*0.55));
+      const bp=all[idx];
+      const angle=Math.random()*Math.PI*2;
+      const blen=18+Math.random()*48;
+      const bpts=displace(bp.x,bp.y,bp.x+Math.cos(angle)*blen,bp.y+Math.sin(angle)*blen,4,0.55);
+      drawPts(bpts,5,'#0088ff',0.11,12);
+      drawPts(bpts,1,'#88eeff',0.45,4);
+    }
+  }
+
+  function entry(){
+    const s=Math.random();
+    if(s<0.5) return{x:W*(0.05+Math.random()*0.9),y:-6};
+    if(s<0.75) return{x:-6,y:H*Math.random()*0.45};
+    return{x:W+6,y:H*Math.random()*0.45};
+  }
+
+  function flash(){
+    ctx.clearRect(0,0,W,H);
+    const e=entry();drawBolt(buildRoute(e.x,e.y));
+    if(Math.random()<0.38){const e2=entry();drawBolt(buildRoute(e2.x,e2.y));}
+  }
+
+  function schedule(){
+    if(_lightningGen!==gen) return;
+    setTimeout(()=>{
+      if(_lightningGen!==gen) return;
+      flash();
+      setTimeout(()=>{
+        ctx.clearRect(0,0,W,H);
+        if(Math.random()<0.52){
+          setTimeout(()=>{
+            if(_lightningGen!==gen) return;
+            flash();
+            setTimeout(()=>{ctx.clearRect(0,0,W,H);schedule();},50+Math.random()*80);
+          },28+Math.random()*48);
+        } else {schedule();}
+      },60+Math.random()*100);
+    },900+Math.random()*2600);
+  }
+  schedule();
+}
+
 async function renderOverview(){
   stopIdleChases();
   const el = document.getElementById('overviewContent');
@@ -1545,10 +1728,12 @@ async function renderOverview(){
   const totalMax = counts.maxWall + counts.maxFingerboard + counts.maxConditioning + counts.maxStretching;
   const pct = totalMax > 0 ? Math.round((totalDone/totalMax)*100) : 0;
   const planLevel = await getValRaw('planLevel', 1);
+  const playerName = await getValRaw('playerName', '');
+  const displayName = (playerName && playerName.trim()) ? playerName.trim().toUpperCase() : 'UNIDENTIFIED';
 
   let html = `
     <div class="lvl-block">
-      <div class="vincent-label">VINCENT</div>
+      <div class="vincent-label">${displayName}</div>
       <div class="lvl-bar-track">
         <div class="lvl-bar-track-inner">
         <div class="lvl-bar-leds">${buildLvlBarLeds(60, Math.round(pct/100*60))}</div>
@@ -1557,7 +1742,40 @@ async function renderOverview(){
       </div>
     </div>
     <div class="stat-box">
-      <div class="stat-box-inner">
+      <div class="stat-box-inner ring-lightning-wrap">
+      <svg class="ring-lightning" viewBox="0 0 300 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="lglow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="lglow2" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Bolt 1 — left-centre, warm white -->
+        <g class="lbolt1">
+          <polyline points="82,0 70,36 85,36 60,78 76,78 50,130 65,130 42,200"
+            stroke="rgba(255,255,180,0.18)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#lglow2)"/>
+          <polyline points="82,0 70,36 85,36 60,78 76,78 50,130 65,130 42,200"
+            stroke="rgba(255,255,220,0.95)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#lglow)"/>
+        </g>
+        <!-- Bolt 2 — right, cool blue-white -->
+        <g class="lbolt2">
+          <polyline points="210,0 222,33 205,33 228,72 210,72 238,128 218,128 244,200"
+            stroke="rgba(180,210,255,0.18)" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#lglow2)"/>
+          <polyline points="210,0 222,33 205,33 228,72 210,72 238,128 218,128 244,200"
+            stroke="rgba(210,230,255,0.95)" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#lglow)"/>
+        </g>
+        <!-- Bolt 3 — centre, shorter branch -->
+        <g class="lbolt3">
+          <polyline points="148,0 158,28 143,28 164,64 148,64 170,112 154,112 175,158"
+            stroke="rgba(255,245,160,0.16)" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#lglow2)"/>
+          <polyline points="148,0 158,28 143,28 164,64 148,64 170,112 154,112 175,158"
+            stroke="rgba(255,250,200,0.9)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#lglow)"/>
+        </g>
+      </svg>
       <div class="ring-grid">
         ${ringCard(counts.wall, counts.maxWall, 'var(--accent)', 'wall', 'ring-wall')}
         ${ringCard(counts.fingerboard, counts.maxFingerboard, 'var(--blue)', 'hand', 'ring-fb')}
@@ -1589,8 +1807,8 @@ async function renderOverview(){
         <div class="cal-weeknum">${i+1}</div>
         ${row.map(cell=> cell.rest
           ? (i===4
-              ? `<div class="cal-box"><div class="cal-box-inner">${miniPixelLetter('D')}</div></div>`
-              : `<div class="cal-box"><div class="cal-box-inner"></div></div>`)
+              ? `<div class="cal-box" style="padding:0;background:var(--panel-alt);">${miniPixelLetter('D')}</div>`
+              : `<div class="cal-box" style="padding:0;background:var(--panel-alt);">${miniPixelLetter('R')}</div>`)
           : `<div class="cal-box"><div class="cal-box-inner" style="${catBoxBackground(cell.categories)}"></div></div>`).join('')}
       </div>`).join('')}
       </div>
@@ -1610,6 +1828,7 @@ async function renderOverview(){
       animateNumber(document.getElementById('heroPct'), pct, '%');
     });
   });
+  initRingLightning();
 }
 
 function spawnConfetti(){
@@ -1845,36 +2064,53 @@ async function updateBWDisplay(skey, weightValue){
 }
 
 function fingerboardCardHTML(weekKey, key, fb, dayIdx){
-  // Store fb data for the timer to retrieve
   if(!window.FB_OBJECTS) window.FB_OBJECTS = {};
   const fbKey = `${weekKey}:${key}`;
   window.FB_OBJECTS[fbKey] = {fb, title: fb.title};
 
-  let rows = fb.sets.map(s=>{
-    const skey = `${weekKey}:${key}:set${s.n}`;
-    let out = `<tr>
-      <td><input type="checkbox" data-key="done:${skey}"></td>
-      <td class="mono">${s.n}</td>
-      <td>${s.grip}</td>
-      <td class="mono">${s.hang}</td>
-      <td><input type="text" data-weight="${skey}" placeholder="+/- kg"></td>
-      <td><span class="fb-bw-pct" data-bw-for="${skey}"></span></td>
-    </tr>`;
-    if(s.rest && !s.last){
-      out += `<tr class="rest"><td colspan="6">Rest ${s.rest}</td></tr>`;
+  // Group consecutive sets by grip — each grip = one compact preview card
+  const grips = [];
+  fb.sets.forEach(s=>{
+    if(!grips.length || grips[grips.length-1].grip !== s.grip){
+      grips.push({grip:s.grip, sets:[]});
     }
-    return out;
+    grips[grips.length-1].sets.push(s);
+  });
+
+  const gripCards = grips.map((g,gi)=>{
+    const firstKey = `${weekKey}:${key}:set${g.sets[0].n}`;
+    const allKeys = g.sets.map(s=>`${weekKey}:${key}:set${s.n}`).join(',');
+    const setCount = g.sets.length;
+    const hangInfo = g.sets[0].hang;
+    const restInfo = (g.sets.find(s=>s.rest&&!s.last)||{}).rest || '';
+    const meta = [hangInfo, `${setCount} set${setCount>1?'s':''}`, restInfo ? `${restInfo} rest` : '']
+      .filter(Boolean).join(' · ');
+
+    return `<div class="fb-grip-card" spellcheck="false">
+      <div class="fb-grip-card-inner">
+        <div class="fb-grip-head">
+          <div class="fb-grip-info">
+            <div class="fb-grip-name"><span class="fb-grip-ex">Ex${gi+1}</span> — ${g.grip}</div>
+            <div class="fb-grip-meta">${meta}</div>
+          </div>
+          <div class="wt-ctrl">
+            <span class="fb-bw-pct" data-bw-for="${firstKey}"></span>
+            <button type="button" class="wt-btn" data-wt-minus="${firstKey}" data-wt-all="${allKeys}">−</button>
+            <span class="wt-display" data-wt-for="${firstKey}">0 kg</span>
+            <button type="button" class="wt-btn" data-wt-plus="${firstKey}" data-wt-all="${allKeys}">+</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
   }).join('');
+
   const body = `
-    <button type="button" class="fb-timer-btn" data-fb-key="${fbKey}">START</button>
+    <button type="button" class="fb-timer-btn" data-fb-key="${fbKey}">PLAY</button>
     <div class="drill-actions" style="margin-bottom:6px;">
       ${vidButton(fb.guideVid, '▶ Watch guidance video first')}
     </div>
     <div class="note-box">${fb.note}</div>
-    <table class="set-table">
-      <tr><th>Done</th><th>Set</th><th>Edge / Grip</th><th>Hang</th><th>Added wt / assist</th><th>% BW</th></tr>
-      ${rows}
-    </table>`;
+    ${gripCards}`;
   return cardShell(`${weekKey}:${key}`, fb.title, "", fb.time, body, false, 'hand', 'fingerboard', key, dayIdx);
 }
 
@@ -2192,9 +2428,19 @@ function attachHandlers(){
     };
   });
 
-  document.querySelectorAll('input[data-weight]').forEach(inp=>{
-    inp.onblur = ()=> setVal(`fbweight:${inp.dataset.weight}`, inp.value);
-    inp.oninput = ()=> updateBWDisplay(inp.dataset.weight, inp.value);
+  document.querySelectorAll('.wt-btn[data-wt-plus],.wt-btn[data-wt-minus]').forEach(btn=>{
+    btn.onclick = async e=>{
+      e.stopPropagation();
+      const isPlus = 'wtPlus' in btn.dataset;
+      const skey = isPlus ? btn.dataset.wtPlus : btn.dataset.wtMinus;
+      const allKeys = (btn.dataset.wtAll || skey).split(',');
+      let v = parseFloat(await getVal(`fbweight:${skey}`, '0')) || 0;
+      v = isPlus ? v+1 : v-1;
+      await Promise.all(allKeys.map(k => setVal(`fbweight:${k}`, String(v))));
+      const disp = document.querySelector(`.wt-display[data-wt-for="${skey}"]`);
+      if(disp) disp.textContent = (v>0?'+':'')+v+' kg';
+      allKeys.forEach(k => updateBWDisplay(k, String(v)));
+    };
   });
   document.querySelectorAll('input[data-rpe]').forEach(inp=>{
     inp.onblur = ()=> setVal(`condrpe:${inp.dataset.rpe}`, inp.value);
@@ -2233,12 +2479,15 @@ async function hydrateState(){
     if(trRow) trRow.classList.toggle('ticked', cb.checked);
   }
 
-  const defaultAdded = await getValRaw('defaultAddedWeight', '');
-  const weights = document.querySelectorAll('input[data-weight]');
-  for(const inp of weights){
-    const v = await getVal(`fbweight:${inp.dataset.weight}`, '');
-    inp.value = (v !== '' && v !== null && v !== undefined) ? v : (defaultAdded || '');
-    updateBWDisplay(inp.dataset.weight, inp.value);
+  const defaultAdded = parseFloat(await getValRaw('defaultAddedWeight', '')) || 0;
+  const wtDisplays = document.querySelectorAll('.wt-display[data-wt-for]');
+  for(const disp of wtDisplays){
+    const skey = disp.dataset.wtFor;
+    const stored = await getVal(`fbweight:${skey}`, '');
+    const v = (stored !== '' && stored !== null && stored !== undefined)
+      ? (parseFloat(stored) || 0) : defaultAdded;
+    disp.textContent = (v>0?'+':'')+v+' kg';
+    updateBWDisplay(skey, String(v));
   }
   const rpes = document.querySelectorAll('input[data-rpe]');
   for(const inp of rpes){
@@ -2354,7 +2603,7 @@ function startCountdown(sec){
     if(S.paused) return;
     S.remaining--;
     if(S.remaining<=3 && S.remaining>0) snd(playTick);
-    if(S.remaining<=0){ clearTick(); advancePhase(); } else render();
+    if(S.remaining<=0){ render(); clearTick(); setTimeout(advancePhase, 500); } else render();
   },1000);
 }
 
@@ -2402,10 +2651,14 @@ function buildExercises(fb, defaultWt){
 /* ── Render helpers ── */
 function ov(){ return document.getElementById('fbTimerOverlay'); }
 
-function buildTimerLeds(total, filled, colorClass){
+function buildTimerLeds(totalSec, remaining, colorClass){
+  // numLeds = duration in seconds capped at 30 so each LED = 1s (or 2s+ for long rests)
+  const numLeds = Math.min(40, totalSec);
+  const elapsed = Math.max(0, totalSec - remaining);
+  const filled  = Math.floor(elapsed * numLeds / totalSec);
   let s = '';
-  for(let i=0;i<total;i++){
-    const lit = i<filled;
+  for(let i=0;i<numLeds;i++){
+    const lit = i < filled;
     s += `<div class="fbt-led ${lit?colorClass:'dim'}" style="animation-delay:-${((i*0.13)%3).toFixed(2)}s"></div>`;
   }
   return `<div class="fbt-led-bar">${s}</div>`;
@@ -2434,27 +2687,55 @@ function posBlockHtml(ex){
     ? `${ex.repeaterOn}s on / ${ex.repeaterOff}s off × ${ex.repeaterReps}`
     : `${ex.hangSec}s hang · ${ex.sets.length} set${ex.sets.length>1?'s':''}`;
   const setNum = S.phase==='SET_REST' ? S.setIdx : S.setIdx+1;
-  const exSetLine = `Ex ${S.exIdx+1}/${S.exercises.length} · Set ${setNum}/${ex.sets.length}`;
-  return `<div class="fbt-pos-block">
+  const exSetLine = `Set <span style='color:#fff'>${setNum}/${ex.sets.length}</span> · Ex <span style='color:#fff'>${S.exIdx+1}/${S.exercises.length}</span>`;
+  return `<div class="fbt-pos-frame"><div class="fbt-pos-block">
     <div class="fbt-pos-name">${ex.grip}</div>
     <div class="fbt-pos-seq">${seqLine}</div>
     <div class="fbt-pos-info">${exSetLine}</div>
-  </div>`;
+  </div></div>`;
 }
 
 function headerHtml(){
+  const xSvg = `<svg viewBox="0 0 5 5" width="34" height="34" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="1" height="1" fill="currentColor"/>
+    <rect x="4" y="0" width="1" height="1" fill="currentColor"/>
+    <rect x="1" y="1" width="1" height="1" fill="currentColor"/>
+    <rect x="3" y="1" width="1" height="1" fill="currentColor"/>
+    <rect x="2" y="2" width="1" height="1" fill="currentColor"/>
+    <rect x="1" y="3" width="1" height="1" fill="currentColor"/>
+    <rect x="3" y="3" width="1" height="1" fill="currentColor"/>
+    <rect x="0" y="4" width="1" height="1" fill="currentColor"/>
+    <rect x="4" y="4" width="1" height="1" fill="currentColor"/>
+  </svg>`;
   return `<div class="fbt-header">
-    <button type="button" class="fbt-exit-btn" id="fbt-close-btn">✕</button>
+    <button type="button" class="fbt-exit-btn" id="fbt-close-btn">
+      <div class="fbt-exit-frame"><div class="fbt-exit-cell">${xSvg}</div></div>
+    </button>
   </div>`;
 }
 
-function controlsHtml(leftLabel, centreClass, centreLabel, rightLabel){
-  const pl = S.paused ? '▶ Resume' : '⏸ Pause';
+function controlsHtml(centreClass, centreLabel){
+  const pl = S.paused ? 'RESUME' : 'PAUSE';
   const cl = centreLabel || pl;
+  const col = centreClass.replace('fbt-ctrl-','');
+  const backSvg = `<svg viewBox="0 0 5 5" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="0" width="1" height="1" fill="currentColor"/>
+    <rect x="3" y="1" width="2" height="1" fill="currentColor"/>
+    <rect x="0" y="2" width="5" height="1" fill="currentColor"/>
+    <rect x="3" y="3" width="2" height="1" fill="currentColor"/>
+    <rect x="4" y="4" width="1" height="1" fill="currentColor"/>
+  </svg>`;
+  const fwdSvg = `<svg viewBox="0 0 5 5" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="1" height="1" fill="currentColor"/>
+    <rect x="0" y="1" width="2" height="1" fill="currentColor"/>
+    <rect x="0" y="2" width="5" height="1" fill="currentColor"/>
+    <rect x="0" y="3" width="2" height="1" fill="currentColor"/>
+    <rect x="0" y="4" width="1" height="1" fill="currentColor"/>
+  </svg>`;
   return `<div class="fbt-controls">
-    <button type="button" class="fbt-ctrl" id="fbt-prev">${leftLabel||'◀ Back'}</button>
-    <button type="button" class="fbt-ctrl ${centreClass}" id="fbt-pause">${cl}</button>
-    <button type="button" class="fbt-ctrl" id="fbt-skip">${rightLabel||'Skip ▶'}</button>
+    <div class="fbt-ctrl-frame"><button type="button" class="fbt-ctrl" id="fbt-prev">${backSvg}</button></div>
+    <div class="fbt-ctrl-frame is-center is-${col}"><button type="button" class="fbt-ctrl is-${col}" id="fbt-pause">${cl}</button></div>
+    <div class="fbt-ctrl-frame"><button type="button" class="fbt-ctrl" id="fbt-skip">${fwdSvg}</button></div>
   </div>`;
 }
 
@@ -2476,89 +2757,91 @@ function showExitConfirm(){
 
 /* ── Screens ── */
 function renderPrep(){
-  const ex   = S.exercises[S.exIdx];
-  const isFirst = S.exIdx===0 && S.setIdx===0;
+  const ex = S.exercises[S.exIdx];
+  const ledBar = buildTimerLeds(PREP_SEC, S.remaining, 'lit-gold');
   ov().innerHTML = `<div class="fbt-screen fbt-prep">
     ${headerHtml()}
     <div class="fbt-body">
       <div class="fbt-state-label fbt-gold-text">Get Ready</div>
       <div class="fbt-big-num fbt-gold-glow">${fmt(S.remaining)}</div>
+      ${ledBar}
+      ${posBlockHtml(ex)}
     </div>
-    ${posBlockHtml(ex)}
-    ${controlsHtml(isFirst?'✕ Exit':'◀ Back','fbt-ctrl-gold',null,'Skip ▶')}
+    ${controlsHtml('fbt-ctrl-gold')}
   </div>`;
   wireControls();
 }
 
 function renderHang(){
   const ex = S.exercises[S.exIdx];
-  let timerHtml, progressHtml;
+  let bodyHtml, progressHtml, ctrlClass;
   if(ex.isRepeater){
     const isOn = S.repPhase==='ON';
     const totalSec = isOn ? ex.repeaterOn : ex.repeaterOff;
-    timerHtml = `
-      <div class="fbt-rep-row">
-        <span class="fbt-rep-label">${isOn?'Hang':'Rest'}</span>
-        <span class="fbt-rep-num">${fmt(S.remaining)}</span>
-        <span class="fbt-rep-label">${isOn?'<span class="fbt-orange-text">ON</span>':'<span class="fbt-blue-text">OFF</span>'}</span>
-      </div>
-      <div class="fbt-rep-count">${S.repNum+1} / ${ex.repeaterReps}</div>`;
-    const repFilled = Math.round((1-(S.remaining/totalSec))*30);
-    progressHtml = buildTimerLeds(30, repFilled, isOn?'lit-orange':'lit-blue');
+    ctrlClass = isOn ? 'fbt-ctrl-orange' : 'fbt-ctrl-blue';
+    bodyHtml = `
+      <div class="fbt-state-label ${isOn?'fbt-orange-text':'fbt-blue-text'}">${isOn?'Hang':'Rest'}</div>
+      <div class="fbt-big-num ${isOn?'fbt-orange-glow':'fbt-blue-glow'}">${fmt(S.remaining)}</div>
+      <div class="fbt-rep-counter fbt-orange-text">${S.repNum+1}/${ex.repeaterReps}</div>`;
+    progressHtml = buildTimerLeds(totalSec, S.remaining, isOn?'lit-orange':'lit-blue');
   } else {
-    timerHtml = `<div class="fbt-big-num fbt-orange-glow">${fmt(S.remaining)}</div>`;
-    const hangFilled = Math.round((1-(S.remaining/ex.hangSec))*30);
-    progressHtml = buildTimerLeds(30, hangFilled, 'lit-orange');
+    ctrlClass = 'fbt-ctrl-orange';
+    bodyHtml = `
+      <div class="fbt-state-label fbt-orange-text">Hang</div>
+      <div class="fbt-big-num fbt-orange-glow">${fmt(S.remaining)}</div>`;
+    progressHtml = buildTimerLeds(ex.hangSec, S.remaining, 'lit-orange');
   }
   ov().innerHTML = `<div class="fbt-screen fbt-hang">
     ${headerHtml()}
     <div class="fbt-body">
-      <div class="fbt-state-tag">
-        <span class="fbt-blink-dot fbt-orange-bg"></span>
-        <span class="fbt-orange-text fbt-state-label">Hang</span>
-      </div>
-      ${timerHtml}
+      ${bodyHtml}
       ${progressHtml}
+      ${posBlockHtml(ex)}
     </div>
-    ${posBlockHtml(ex)}
-    ${controlsHtml('◀ Back','fbt-ctrl-orange',null,'Skip ▶')}
+    ${controlsHtml(ctrlClass)}
   </div>`;
   wireControls();
 }
 
 function renderSetRest(){
-  const ex  = S.exercises[S.exIdx];
+  const ex = S.exercises[S.exIdx];
   ov().innerHTML = `<div class="fbt-screen fbt-rest">
     ${headerHtml()}
     <div class="fbt-body">
-      <div class="fbt-state-label fbt-blue-text">Set Rest</div>
+      <div class="fbt-state-label fbt-blue-text">Rest</div>
       <div class="fbt-big-num fbt-blue-glow">${fmt(S.remaining)}</div>
-      ${buildTimerLeds(30, Math.round((1-(S.remaining/ex.restSec))*30), 'lit-blue')}
+      ${buildTimerLeds(ex.restSec, S.remaining, 'lit-blue')}
+      ${posBlockHtml(ex)}
     </div>
-    ${posBlockHtml(ex)}
-    ${controlsHtml('◀ Redo','fbt-ctrl-blue',null,'Begin ▶')}
+    ${controlsHtml('fbt-ctrl-blue')}
   </div>`;
   wireControls();
 }
 
 function renderExRest(){
   const nextEx = S.exercises[S.exIdx+1];
-  const nextBlock = nextEx ? `<div class="fbt-next-block">
-    <div class="fbt-next-label">Next Exercise</div>
-    <div class="fbt-next-name">${nextEx.grip}</div>
-    <div class="fbt-next-seq">${nextEx.isRepeater
-      ? `${nextEx.repeaterOn}s/${nextEx.repeaterOff}s × ${nextEx.repeaterReps} · ${nextEx.sets.length} sets`
-      : `${nextEx.hangSec}s hang · ${nextEx.sets.length} sets`}</div>
-  </div>` : '<div class="fbt-next-block fbt-next-last">Last exercise done!</div>';
+  // Next exercise shown in pos-block position (consistent with all other screens)
+  const nextPosBlock = nextEx
+    ? `<div class="fbt-pos-frame"><div class="fbt-pos-block">
+        <div class="fbt-pos-name">${nextEx.grip}</div>
+        <div class="fbt-pos-seq">${nextEx.isRepeater
+          ? `${nextEx.repeaterOn}s on / ${nextEx.repeaterOff}s off × ${nextEx.repeaterReps}`
+          : `${nextEx.hangSec}s hang · ${nextEx.sets.length} set${nextEx.sets.length>1?'s':''}`}</div>
+        <div class="fbt-pos-info">NEXT · Ex <span style='color:#fff'>${S.exIdx+2}/${S.exercises.length}</span></div>
+      </div></div>`
+    : `<div class="fbt-pos-frame"><div class="fbt-pos-block">
+        <div class="fbt-pos-name fbt-blue-text">All done!</div>
+        <div class="fbt-pos-info">Last exercise complete</div>
+      </div></div>`;
   ov().innerHTML = `<div class="fbt-screen fbt-exrest">
     ${headerHtml()}
     <div class="fbt-body">
-      <div class="fbt-state-label fbt-green-text">Exercise Done</div>
-      <div class="fbt-big-num fbt-green-glow">${fmt(S.remaining)}</div>
-      ${buildTimerLeds(30, Math.round((1-(S.remaining/EXREST_SEC))*30), 'lit-green')}
+      <div class="fbt-state-label fbt-blue-text">Rest</div>
+      <div class="fbt-big-num fbt-blue-glow">${fmt(S.remaining)}</div>
+      ${buildTimerLeds(EXREST_SEC, S.remaining, 'lit-blue')}
+      ${nextPosBlock}
     </div>
-    ${nextBlock}
-    ${controlsHtml('◀ Back','fbt-ctrl-green',null,'Skip ▶')}
+    ${controlsHtml('fbt-ctrl-blue')}
   </div>`;
   wireControls();
 }
@@ -2744,7 +3027,7 @@ function wireControls(){
     clearTick();
     if(S.phase==='PREP'){
       if(S.exIdx===0 && S.setIdx===0){
-        showExitConfirm(); // first prep, back = close with confirm
+        closeTimer(); // direct exit from first prep
       } else if(S.setIdx>0){
         S.setIdx--;
         if(S.setsDone[S.exIdx]) S.setsDone[S.exIdx][S.setIdx]=null;
@@ -2768,7 +3051,7 @@ function wireControls(){
     }
   };
 
-  if(closeBtn) closeBtn.onclick = showExitConfirm;
+  if(closeBtn) closeBtn.onclick = closeTimer;
 }
 
 function wireRpe(){
