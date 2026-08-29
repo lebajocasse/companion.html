@@ -1773,6 +1773,8 @@ function initLvlOverlay(planLevel, pct){
     const artH=()=>Math.ceil(cv.height/PX);
     let frame=0;
     function draw(){
+      // Self-stop: exit if the canvas element is no longer in the document
+      if(!cv.isConnected) return;
       const W=cv.width, H=cv.height;
       if(!W||!H){ setTimeout(()=>requestAnimationFrame(draw),20); return; }
       const aw=artW(), ah=artH();
@@ -1794,7 +1796,7 @@ function initLvlOverlay(planLevel, pct){
       const eCache={};
       for(let ay=0;ay<ah;ay++){
         for(let ax=fw;ax<aw-1;ax++){
-          const raw=ax-ay*0.28;
+          const raw=ax-ay*0.28+frame*0.04; // animate: scroll hatch diagonally
           const d=(raw%4+4)%4;
           if(d<0.9){
             const esn=Math.floor(raw/4);
@@ -2347,6 +2349,29 @@ function drawScene(now){
         ctx.lineWidth=LW;
         ctx.stroke();
         ctx.shadowBlur=0;
+
+        // Energy shimmer — clip noise to donut segment shape
+        ctx.save();
+        ctx.shadowBlur=0;
+        ctx.beginPath();
+        ctx.arc(c.x,c.y,c.r+LW,a0,a1);
+        ctx.arc(c.x,c.y,c.r,a1,a0,true);
+        ctx.closePath();
+        ctx.clip();
+        const PXN=4;
+        const bxN=Math.floor(c.x-c.r-LW), byN=Math.floor(c.y-c.r-LW);
+        const bwN=Math.ceil((c.r+LW)*2), bhN=Math.ceil((c.r+LW)*2);
+        for(let ny=byN;ny<byN+bhN;ny+=PXN){
+          for(let nx=bxN;nx<bxN+bwN;nx+=PXN){
+            const n=Math.random();
+            if(n>0.58){
+              ctx.globalAlpha=n*0.22;
+              ctx.fillStyle=c.color;
+              ctx.fillRect(nx,ny,PXN,PXN);
+            }
+          }
+        }
+        ctx.restore();
       }
     }
   }
@@ -2360,8 +2385,8 @@ function drawScene(now){
     ctx.beginPath();
     ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
     ctx.strokeStyle=c.color;
-    ctx.lineWidth=1.0;
-    ctx.globalAlpha=hit?0.40:0.22;
+    ctx.lineWidth=1.5;
+    ctx.globalAlpha=hit?0.40:0.45;
     ctx.stroke();
   }
   ctx.restore();
@@ -2434,12 +2459,15 @@ const SPRITE_DEFS={
 const iconState={};
 
 function getDataUrl(cls,prop){
+  // Use off-screen (not display:none) so CSS custom properties compute reliably
   const el=document.createElement('div');
-  el.className=cls;el.style.display='none';
+  el.className=cls;
+  el.style.cssText='position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;pointer-events:none;';
   document.body.appendChild(el);
   const val=getComputedStyle(el).getPropertyValue(prop).trim();
   document.body.removeChild(el);
-  return val.replace(/^url\(["']?/,'').replace(/["']?\)$/,'');
+  // Strip url("...") or url('...') or url(...) wrapper, including optional inner whitespace
+  return val.replace(/^url\(\s*["']?/,'').replace(/["']?\s*\)$/,'');
 }
 
 function buildPixelFrames(img,fw,fh,numFrames,rgb){
@@ -2546,7 +2574,7 @@ async function renderOverview(){
 
   let html = `
     <div class="lvl-block">
-      <div class="vincent-label">\${displayName}</div>
+      <div class="vincent-label">${displayName}</div>
       <div class="lvl-bar-track">
         <div class="lvl-bar-track-inner">
           <canvas class="lvl-bar-canvas" id="lvlBarCanvas"></canvas>
@@ -2563,7 +2591,7 @@ async function renderOverview(){
     </div>
     <div class="stat-box">
       <div class="stat-box-inner">
-      <div class="vincent-label" style="text-align:center;margin-bottom:10px;">ALL TIME</div>
+      <div class="vincent-label" style="justify-content:center;padding:4px 0;margin-bottom:6px;">ALL TIME</div>
       <div class="alltime-row alltime-row-5">
         <div class="alltime-stat"><span class="alltime-num" style="color:var(--accent)" data-count="${allTime.wall}">0</span><span class="alltime-hours" style="color:var(--accent)">${allTime.wallHours.toFixed(1)}h</span><span class="alltime-lbl">Wall</span></div>
         <div class="alltime-stat"><span class="alltime-num" style="color:var(--blue)" data-count="${allTime.fingerboard}">0</span><span class="alltime-hours" style="color:var(--blue)">${allTime.fingerboardHours.toFixed(1)}h</span><span class="alltime-lbl">Fingers</span></div>
